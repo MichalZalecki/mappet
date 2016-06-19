@@ -7,9 +7,9 @@ Lightweight, composable mappers for object transformations/normalization.
 ## Use cases
 
 * Fault tolerant object transformations, no more `Cannot read property of undefined`.
-* Normalizing API responses shape and key names e.g. to camelCase or flattering nested payloads
+* Normalizing API responses shape and key names e.g. to camelCase or flattening nested payloads
 * Preparing nested API request payloads from flat form data
-* Filtering object entries e.g. omitting entries with undefined value
+* Filtering object entries e.g. omitting entries with `undefined` value
 * Per field modifications e.g. `null` to empty string to make React inputs happy
 
 ## Examples
