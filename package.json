@@ -28,5 +28,14 @@
   },
   "dependencies": {
     "lodash": "^4.13.1"
-  }
+  },
+  "keywords": [
+    "normalization",
+    "normalize",
+    "normalizr",
+    "transformation",
+    "object",
+    "mapper",
+    "nested"
+  ]
 }
