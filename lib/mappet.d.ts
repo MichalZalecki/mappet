@@ -1,6 +1,10 @@
-export interface IMapper {
-    (object: any): any;
+export interface IModifier {
+    (value: any): any;
 }
-export declare function always<T>(value: T): T;
-export declare function accept(value?: any): boolean;
-export default function mappet(schema: Array<any>, filter?: any): IMapper;
+export interface IFilter {
+    (dest: String, value: any, modifier: IModifier): boolean;
+}
+export declare type SourceEntry = [String, any, IModifier];
+export declare type SchemaEntry = [String, String, IModifier];
+export declare type Schema = Array<SchemaEntry>;
+export default function mappet(schema: Schema, filter?: IFilter): Object;
