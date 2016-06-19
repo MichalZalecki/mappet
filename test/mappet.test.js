@@ -45,12 +45,17 @@ function skipingFieldsTest(t) {
 
 function modifyingFieldsTest(t) {
   const uppercase = text => text.toUpperCase();
+  const nullToEmptyString = value => value === null ? "" : value;
   const uppercaseSchema = [
     ["firstName", "first_name", uppercase],
+    ["age", "age"],
+    ["nickname", "nickname", nullToEmptyString],
   ];
   const uppercaseMapper = mappet(uppercaseSchema);
   const source = {
     first_name: "Michal",
+    age: 21,
+    nickname: null,
     card: {
       number: "5555-5555-5555-4444",
     },
@@ -58,6 +63,8 @@ function modifyingFieldsTest(t) {
 
   t.deepEqual(uppercaseMapper(source), {
     firstName: "MICHAL",
+    age: 21,
+    nickname: "",
   }, "allows for per field modification");
 }
 
