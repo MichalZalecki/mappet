@@ -2,18 +2,31 @@
   "name": "mappet",
   "version": "0.0.1",
   "description": "Lightweight, composable mappers for object transformations",
-  "main": "index.js",
+  "main": "./lib/mappet.js",
+  "typings": "./lib/mappet.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "node test/mappet.test.js | tap-spec"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MichalZalecki/mappet.git"
   },
-  "author": "",
+  "author": "Michal Zalecki <michal@michalzalecki.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MichalZalecki/mappet/issues"
   },
-  "homepage": "https://github.com/MichalZalecki/mappet#readme"
+  "homepage": "https://github.com/MichalZalecki/mappet#readme",
+  "devDependencies": {
+    "tap-spec": "^4.1.1",
+    "tape": "^4.5.1",
+    "typescript": "^1.8.10"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "lodash": "^4.13.1"
+  }
 }

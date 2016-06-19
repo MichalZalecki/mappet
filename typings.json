@@ -1,0 +1,8 @@
+{
+  "name": "mappet",
+  "dependencies": {},
+  "globalDependencies": {
+    "lodash": "registry:dt/lodash#3.10.0+20160330154726",
+    "tape": "registry:dt/tape#4.2.2+20160317120654"
+  }
+}
