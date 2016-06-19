@@ -1,6 +1,6 @@
 {
   "name": "mappet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Lightweight, composable mappers for object transformations",
   "main": "./lib/mappet.js",
   "typings": "./lib/mappet.d.ts",
