@@ -4,6 +4,12 @@
 
 Lightweight, composable mappers for object transformations/normalization.
 
+***
+[API Docs](https://michalzalecki.github.io/mappet)
+|
+[Examples](#examples)
+***
+
 ## Use cases
 
 * Fault tolerant object transformations, no more `Cannot read property of undefined`.
