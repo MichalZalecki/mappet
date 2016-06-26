@@ -36,11 +36,11 @@ export type SchemaEntry = [String, String, IModifier];
 export type Schema = Array<SchemaEntry>;
 
 /**
- * Always return passed value
+ * Identity return passed value
  *
  * @param value - Value which will be returned
  */
-function always<T>(value: T): T {
+function identity<T>(value: T): T {
   return value;
 }
 
@@ -61,7 +61,7 @@ function accept(...args: Array<any>): boolean {
 export default function mappet(schema: Schema, filter: IFilter = accept): IMapper {
   return (object: Object) => {
     return schema
-      .map(([dest, source, modifier = always]) => [dest, get(object, source), modifier])
+      .map(([dest, source, modifier = identity]) => [dest, get(object, source), modifier])
       .filter((args: SourceEntry) => filter.apply(this, args))
       .reduce((akk: Object, entry: SourceEntry) => {
         const [dest, value, modifier] = entry;
