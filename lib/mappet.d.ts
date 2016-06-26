@@ -3,7 +3,7 @@
  *
  * @param value - Value to be changed
  */
-export interface IModifier {
+export interface Modifier {
     (value: any): any;
 }
 /**
@@ -13,8 +13,8 @@ export interface IModifier {
  * @param value - Value from source object
  * @param modifier - Modifier function
  */
-export interface IFilter {
-    (dest: string, value: any, modifier: IModifier): boolean;
+export interface Filter {
+    (dest: string, value: any, modifier: Modifier): boolean;
 }
 /**
  * Mapper function interface that accepts object and returns mapped
@@ -23,11 +23,11 @@ export interface IFilter {
  * @param source - Source object to be mapped
  * @returns Mapped object
  */
-export interface IMapper {
+export interface Mapper {
     (source: Object): Object;
 }
-export declare type SourceEntry = [string, any, IModifier];
-export declare type SchemaEntry = [string, string, IModifier];
+export declare type SourceEntry = [string, any, Modifier];
+export declare type SchemaEntry = [string, string, Modifier];
 export declare type Schema = Array<SchemaEntry>;
 /**
  * Factory for creating mappers functions
@@ -36,4 +36,4 @@ export declare type Schema = Array<SchemaEntry>;
  * @param filter - Determine whether entry should be keept or omitted
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, filter?: IFilter): IMapper;
+export default function mappet(schema: Schema, filter?: Filter): Mapper;

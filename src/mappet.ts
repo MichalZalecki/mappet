@@ -5,7 +5,7 @@ import { get, set } from "lodash";
  *
  * @param value - Value to be changed
  */
-export interface IModifier {
+export interface Modifier {
   (value: any): any;
 }
 
@@ -16,8 +16,8 @@ export interface IModifier {
  * @param value - Value from source object
  * @param modifier - Modifier function
  */
-export interface IFilter {
-  (dest: string, value: any, modifier: IModifier): boolean;
+export interface Filter {
+  (dest: string, value: any, modifier: Modifier): boolean;
 }
 
 /**
@@ -27,12 +27,12 @@ export interface IFilter {
  * @param source - Source object to be mapped
  * @returns Mapped object
  */
-export interface IMapper {
+export interface Mapper {
   (source: Object): Object;
 }
 
-export type SourceEntry = [string, any, IModifier];
-export type SchemaEntry = [string, string, IModifier];
+export type SourceEntry = [string, any, Modifier];
+export type SchemaEntry = [string, string, Modifier];
 export type Schema = Array<SchemaEntry>;
 
 /**
@@ -58,7 +58,7 @@ function accept(...args: Array<any>): boolean {
  * @param filter - Determine whether entry should be keept or omitted
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, filter: IFilter = accept): IMapper {
+export default function mappet(schema: Schema, filter: Filter = accept): Mapper {
   return (object: Object) => {
     return schema
       .map(([dest, source, modifier = identity]) => [dest, get(object, source), modifier])
