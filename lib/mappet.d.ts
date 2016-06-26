@@ -14,7 +14,7 @@ export interface IModifier {
  * @param modifier - Modifier function
  */
 export interface IFilter {
-    (dest: String, value: any, modifier: IModifier): boolean;
+    (dest: string, value: any, modifier: IModifier): boolean;
 }
 /**
  * Mapper function interface that accepts object and returns mapped
@@ -26,8 +26,8 @@ export interface IFilter {
 export interface IMapper {
     (source: Object): Object;
 }
-export declare type SourceEntry = [String, any, IModifier];
-export declare type SchemaEntry = [String, String, IModifier];
+export declare type SourceEntry = [string, any, IModifier];
+export declare type SchemaEntry = [string, string, IModifier];
 export declare type Schema = Array<SchemaEntry>;
 /**
  * Factory for creating mappers functions
