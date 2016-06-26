@@ -17,7 +17,7 @@ export interface IModifier {
  * @param modifier - Modifier function
  */
 export interface IFilter {
-  (dest: String, value: any, modifier: IModifier): boolean;
+  (dest: string, value: any, modifier: IModifier): boolean;
 }
 
 /**
@@ -31,8 +31,8 @@ export interface IMapper {
   (source: Object): Object;
 }
 
-export type SourceEntry = [String, any, IModifier];
-export type SchemaEntry = [String, String, IModifier];
+export type SourceEntry = [string, any, IModifier];
+export type SchemaEntry = [string, string, IModifier];
 export type Schema = Array<SchemaEntry>;
 
 /**
