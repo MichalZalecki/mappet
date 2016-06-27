@@ -10,6 +10,12 @@ Lightweight, composable mappers for object transformations/normalization.
 [Examples](#examples)
 ***
 
+## Installation
+
+```
+npm i -S mappet
+```
+
 ## Use cases
 
 * Fault tolerant object transformations, no more `Cannot read property of undefined`.
@@ -148,3 +154,11 @@ const source = {
 //    ]
 //  }
 ```
+
+## TODO
+
+* Strict checks mode - throw error when source value is undefined
+* Rewrite tests in TS
+* Use UMD modules format
+* Add linting
+* Add .editorconfig
