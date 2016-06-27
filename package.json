@@ -6,8 +6,10 @@
   "typings": "./lib/mappet.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:watch": "tsc -w",
     "test": "node test/mappet.test.js | tap-spec",
-    "doc": "typedoc --out doc src/mappet.ts"
+    "doc": "typedoc --out doc src/mappet.ts",
+    "clean": "rm -rf doc lib"
   },
   "repository": {
     "type": "git",
