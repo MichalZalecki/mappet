@@ -32,8 +32,9 @@ export interface Mapper {
 }
 
 export type SourceEntry = [string, any, Modifier];
-export type SchemaEntry = [string, string, Modifier];
-export type Schema = Array<SchemaEntry>;
+export type SchemaEntry = [string, string];
+export type ModifiableSchemaEntry = [string, string, Modifier];
+export type Schema = Array<SchemaEntry | ModifiableSchemaEntry>;
 
 /**
  * Identity return passed value
@@ -61,7 +62,8 @@ function accept(...args: Array<any>): boolean {
 export default function mappet(schema: Schema, filter: Filter = accept): Mapper {
   return (object: Object) => {
     return schema
-      .map(([dest, source, modifier = identity]) => [dest, get(object, source), modifier])
+      .map(([dest, source, modifier = identity]: ModifiableSchemaEntry) =>
+        [dest, get(object, source), modifier])
       .filter((args: SourceEntry) => filter.apply(this, args))
       .reduce((akk: Object, entry: SourceEntry) => {
         const [dest, value, modifier] = entry;

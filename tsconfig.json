@@ -5,14 +5,15 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "rootDir": "./src",
-    "outDir": "./lib",
+    "outDir": "./",
     "declaration": true,
     "listFiles": true,
     "newLine": "LF",
     "pretty": true
   },
   "files": [
-    "typings/index.d.ts",
-    "src/mappet.ts"
+    "./typings/index.d.ts",
+    "./src/test/mappet.test.ts",
+    "./src/lib/mappet.ts"
   ]
 }

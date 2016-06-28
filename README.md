@@ -158,7 +158,5 @@ const source = {
 ## TODO
 
 * Strict checks mode - throw error when source value is undefined
-* Rewrite tests in TS
 * Use UMD modules format
 * Add linting
-* Add .editorconfig

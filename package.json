@@ -1,6 +1,6 @@
 {
   "name": "mappet",
-  "version": "0.1.4",
+  "version": "0.2.4",
   "description": "Lightweight, composable mappers for object transformations",
   "main": "./lib/mappet.js",
   "typings": "./lib/mappet.d.ts",
@@ -8,7 +8,7 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "test": "node test/mappet.test.js | tap-spec",
-    "doc": "typedoc --out doc src/mappet.ts",
+    "doc": "typedoc --out doc src/lib/mappet.ts",
     "clean": "rm -rf doc lib"
   },
   "repository": {

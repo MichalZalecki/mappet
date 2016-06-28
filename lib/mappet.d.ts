@@ -27,8 +27,9 @@ export interface Mapper {
     (source: Object): Object;
 }
 export declare type SourceEntry = [string, any, Modifier];
-export declare type SchemaEntry = [string, string, Modifier];
-export declare type Schema = Array<SchemaEntry>;
+export declare type SchemaEntry = [string, string];
+export declare type ModifiableSchemaEntry = [string, string, Modifier];
+export declare type Schema = Array<SchemaEntry | ModifiableSchemaEntry>;
 /**
  * Factory for creating mappers functions
  *
