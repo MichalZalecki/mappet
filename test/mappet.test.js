@@ -66,13 +66,13 @@ function modifyEntry(t) {
     var actual = mapper(source);
     var expected = {
         firstName: "MICHAL",
-        lastName: null
+        lastName: null,
     };
     t.deepEqual(actual, expected, "allows for modifing an entry with modifier");
 }
 function modifyEntryBasedOnSource(t) {
     var formatDate = function (date, source) {
-        return source["country"] === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
+        return source.country === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
     };
     var schema = [
         ["country", "country"],
@@ -86,7 +86,7 @@ function modifyEntryBasedOnSource(t) {
     var actualUS = mapper(sourceUS);
     var expectedUS = {
         country: "us",
-        date: "07/30/16"
+        date: "07/30/16",
     };
     t.deepEqual(actualUS, expectedUS, "allows for mapping depending on source");
     var sourceGB = {
@@ -96,7 +96,7 @@ function modifyEntryBasedOnSource(t) {
     var actualGB = mapper(sourceGB);
     var expectedGB = {
         country: "gb",
-        date: "30/07/16"
+        date: "30/07/16",
     };
     t.deepEqual(actualGB, expectedGB, "allows for mapping depending on source");
 }
@@ -118,8 +118,8 @@ function filterEntry(t) {
     t.deepEqual(actual, expected, "allows for filtering an entry with filter");
 }
 function filterBasedOnSource(t) {
-    var skipIfNotAGift = function (value, source) { return source["isGift"]; };
-    var skipIfGift = function (value, source) { return !source["isGift"]; };
+    var skipIfNotAGift = function (value, source) { return source.isGift; };
+    var skipIfGift = function (value, source) { return !source.isGift; };
     var mapToNull = function () { return null; };
     var schema = [
         ["quantity", "quantity"],
@@ -172,7 +172,7 @@ function composeMappers(t) {
         items: [
             { first_name: "Michal", last_name: "Zalecki" },
             { first_name: "Foo", last_name: "Bar" },
-        ]
+        ],
     };
     var actual = usersMapper(source);
     var expected = {
