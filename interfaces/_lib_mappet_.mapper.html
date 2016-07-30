@@ -73,8 +73,8 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Mapper function interface that accepts object and returns mapped
-						object based on schema passed to mappet</p>
+						<p>Mapper function interface that accepts Source object and returns Result object
+						by transformations according to Schema passed to mappet</p>
 					</div>
 				</div>
 			</section>
@@ -89,25 +89,25 @@
 			<section class="tsd-panel">
 				<h3 class="tsd-before-signature">Callable</h3>
 				<ul class="tsd-signatures tsd-kind-interface tsd-parent-kind-external-module">
-					<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span></li>
+					<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="_lib_mappet_.source.html" class="tsd-signature-type">Source</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_lib_mappet_.result.html" class="tsd-signature-type">Result</a></li>
 				</ul>
 				<ul class="tsd-descriptions">
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/MichalZalecki/mappet/blob/438f6f2/src/lib/mappet.ts#L30">lib/mappet.ts:30</a></li>
+								<li>Defined in <a href="https://github.com/MichalZalecki/mappet/blob/1da303c/src/lib/mappet.ts#L44">lib/mappet.ts:44</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Mapper function interface that accepts object and returns mapped
-								object based on schema passed to mappet</p>
+								<p>Mapper function interface that accepts Source object and returns Result object
+								by transformations according to Schema passed to mappet</p>
 							</div>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
-								<h5>source: <span class="tsd-signature-type">Object</span></h5>
+								<h5>source: <a href="_lib_mappet_.source.html" class="tsd-signature-type">Source</a></h5>
 								<div class="tsd-comment tsd-typography">
 									<div class="lead">
 										<p>Source object to be mapped</p>
@@ -115,8 +115,8 @@
 								</div>
 							</li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Object</span></h4>
-						<p>Mapped object</p>
+						<h4 class="tsd-returns-title">Returns <a href="_lib_mappet_.result.html" class="tsd-signature-type">Result</a></h4>
+						<p>Result</p>
 					</li>
 				</ul>
 			</section>
@@ -150,17 +150,23 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_lib_mappet_.modifier.html" class="tsd-kind-icon">Modifier</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_lib_mappet_.result.html" class="tsd-kind-icon">Result</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module">
+						<a href="_lib_mappet_.source.html" class="tsd-kind-icon">Source</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_lib_mappet_.html#basicschemaentry" class="tsd-kind-icon">Basic<wbr>Schema<wbr>Entry</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
+						<a href="../modules/_lib_mappet_.html#filterableschemaentry" class="tsd-kind-icon">Filterable<wbr>Schema<wbr>Entry</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
 						<a href="../modules/_lib_mappet_.html#modifiableschemaentry" class="tsd-kind-icon">Modifiable<wbr>Schema<wbr>Entry</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
 						<a href="../modules/_lib_mappet_.html#schema" class="tsd-kind-icon">Schema</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_lib_mappet_.html#schemaentry" class="tsd-kind-icon">Schema<wbr>Entry</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_lib_mappet_.html#sourceentry" class="tsd-kind-icon">Source<wbr>Entry</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="../modules/_lib_mappet_.html#accept" class="tsd-kind-icon">accept</a>
