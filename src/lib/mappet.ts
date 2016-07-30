@@ -1,13 +1,13 @@
 import { get, set } from "lodash";
 
-/*
+/**
  * Source interface for defining mapper input object
  */
 export interface Source {
   [key: string]: any;
 }
 
-/*
+/**
  * Result interface for defining mapper output object
  */
 export interface Result {
