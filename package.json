@@ -25,6 +25,7 @@
     "moment": "^2.14.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.5.1",
+    "typedoc": "^0.4.4",
     "typescript": "^1.8.10"
   },
   "directories": {
