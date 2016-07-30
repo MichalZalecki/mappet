@@ -5,9 +5,7 @@
 Lightweight, composable mappers for object transformations/normalization.
 
 ***
-[API Docs](https://michalzalecki.github.io/mappet)
-|
-[Examples](#examples)
+[API Docs](https://michalzalecki.github.io/mappet) | [Examples](#examples)
 ***
 
 ## Installation ([npm](https://www.npmjs.com/package/mappet))
@@ -26,133 +24,134 @@ npm i -S mappet
 
 ## Examples
 
-### Simple transformation
+### Basic
+
+Simple value to value transformation
 
 ```js
-const simpleSchema = [
-  // ["path.to.destination", "path.to.source"]
+const schema  = [
   ["firstName", "first_name"],
-  ["lastName", "last_name"],
   ["cardNumber", "card.number"],
 ];
-
-const simpleMapper = mappet(simpleSchema);
-
+const mapper = mappet(schema);
 const source = {
   first_name: "Michal",
+  last_name: "Zalecki",
   card: {
     number: "5555-5555-5555-4444",
   },
 };
-
-const result = simpleMapper(source);
-
-//  {
-//    firstName: "Michal",
-//    lastName: undefined,
-//    cardNumber: "5555-5555-5555-4444",
-//  }
+const result = mapper(source);
+// {
+//   firstName: "Michal",
+//   cardNumber: "5555-5555-5555-4444",
+// }
 ```
 
-### Skip undefined fields
+### Mapping values
+
+Third element of schema entry is modifier which allows for mapping values. Modifier accepts current
+value and entire, original source object.
 
 ```js
-const simpleSchema = [
+const formatDate = (date, source) => moment(date).format(source.country === "us" ? "MM/DD/YY" : "DD/MM/YY");
+const upperCase = v => v.toUpperCase();
+
+const schema = [
+  ["country", "country", upperCase],
+  ["date", "date", formatDate],
+];
+const mapper = mappet(schema);
+const source = {
+  country: "gb",
+  date: "2016-07-30",
+};
+const result = mapper(sourceUS);
+// {
+//   country: "GB",
+//   date: "30/07/16",
+// }
+```
+
+### Filtering entries
+
+Fourth element of schema entry is filter which allows for omitting entry based on its value or
+entire, original source object.
+
+```js
+const skipIfNotAGift = (value, source) => source.isGift;
+const skipIfGift = (value, source) => !source.isGift;
+const mapToNull = () => null;
+
+const schema = [
+  ["quantity", "quantity"],
+  ["gift.message", "giftMessage", undefined, skipIfNotAGift],
+  ["gift.remind_before_renewing", "remindBeforeRenewingGift", undefined, skipIfNotAGift],
+  ["gift", "gift", mapToNull, skipIfGift],
+];
+const mapper = mappet(schema);
+const source = {
+  quantity: 3,
+  isGift: false,
+  giftMessage: "All best!",
+  remindBeforeRenewingGift: true,
+};
+const result ,= mapper(sourceNotGift);
+// {
+//   quantity: 3,
+//   gift: null,
+// };
+```
+
+### Composing mappers
+
+Mappers are just clojures. It's easy to combine them using modifiers.
+
+```js
+const userSchema = [
   ["firstName", "first_name"],
   ["lastName", "last_name"],
-  ["cardNumber", "card.number"],
 ];
+const userMapper = mappet(userSchema);
 
-const skipUndefined = (dest, value, modifier) => value !== undefined;
-
-const skipUndefinedMapper = mappet(simpleSchema, skipUndefined);
+const usersSchema = [
+  ["totalCount", "total_count"],
+  ["users", "items", users => users.map(userMapper)],
+];
+const usersMapper = mappet(usersSchema);
 
 const source = {
-  first_name: "Michal",
-  card: {
-    number: "5555-5555-5555-4444",
-  },
-};
-
-const result = skipUndefinedMapper(source);
-
-//  {
-//    firstName: "Michal",
-//    cardNumber: "5555-5555-5555-4444"
-//  }
-```
-
-### Per field modification
-
-```js
-const uppercase = text => text.toUpperCase();
-
-const nullToEmptyString = value => value === null ? "" : value;
-
-const uppercaseSchema = [
-  // ["path.to.destination", "path.to.source", modifierFn]
-  ["firstName", "first_name", uppercase],
-  ["age", "age"],
-  ["nickname", "nickname", nullToEmptyString],
-];
-
-const uppercaseMapper = mappet(uppercaseSchema);
-
-const source = {
-  first_name: "Michal",
-  age: 21,
-  nickname: null,
-  card: {
-    number: "5555-5555-5555-4444",
-  },
-};
-
-const result = uppercaseMapper(source);
-
-//  {
-//    firstName: "MICHAL",
-//    age: 21,
-//    nickname: ""
-//  }
-```
-
-### Mappers composition
-
-```js
-const commentSchema = [
-  ["nickname", "nickname"],
-  ["upvotesCount", "upvotes_count"]
-];
-
-const commentMapper = mappet(commentSchema);
-
-const blogSchema = [
-  ["title", "title"],
-  ["createdAt", "meta.created_at", date => moment(date)],
-  ["comments", "comments", comments => comments.map(commentMapper)],
-];
-
-const blogMapper = mappet(blogSchema);
-
-const source = {
-  title: "Foo Bar",
-  meta: {
-    created_at: "2016-12-12 0:00"
-  },
-  comments: [
-    { nickname: "Foo", upvotes_count: 10, created_at: "2016-12-12 1:00" },
-    { nickname: "Bar", upvotes_count: 20, created_at: "2016-12-12 2:00" },
+  total_count: 5,
+  items: [
+    { first_name: "Michal", last_name: "Zalecki" },
+    { first_name: "Foo", last_name: "Bar" },
   ],
 };
+const result = usersMapper(source);
+// {
+//   totalCount: 5,
+//   users: [
+//     { firstName: "Michal", lastName: "Zalecki" },
+//     { firstName: "Foo", lastName: "Bar" },
+//   ],
+// }
+```
 
-//  {
-//    title: "Foo Bar",
-//    createdAt: Moment {_isAMomentObject: true, _i: "2016-12-12 0:00", ...},
-//    comments: [
-//     { nickname: "Foo", upvotesCount: 10 },
-//     { nickname: "Bar", upvotesCount: 20 },
-//    ]
-//  }
+### Strict mode
+
+Mappers in strict mode will throw exception when value is not found on source object.
+
+```js
+const schema  = [
+  ["firstName", "first_name"],
+  ["lastName", "last_name"],
+];
+const mapper = mappet(schema);
+const source = {
+  first_name: "Michal",
+};
+const result = mapper(source);
+// Uncaught Mappet: last_name not found
 ```
 
 ## TODO v1.0.0
