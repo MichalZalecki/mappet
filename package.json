@@ -10,7 +10,8 @@
     "test": "node test/mappet.test.js | tap-spec",
     "doc": "typedoc --out doc src/lib/mappet.ts",
     "clean": "rm -rf doc lib test",
-    "bundle": "browserify lib/mappet.js -s mappet > lib/mappet.standalone.js"
+    "bundle": "browserify lib/mappet.js -s mappet > lib/mappet.standalone.js",
+    "lint": "tslint src/lib/* src/test/*"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "moment": "^2.14.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.5.1",
+    "tslint": "^3.14.0",
     "typedoc": "^0.4.4",
     "typescript": "^1.8.10"
   },

@@ -81,16 +81,15 @@ function accept(...args: Array<any>): boolean {
 export default function mappet(schema: Schema, strictMode: boolean = false): Mapper {
   return (source: Source) => {
     return schema
-      .map(([destPath, sourcePath, modifier=identity, filter=accept]: FilterableSchemaEntry) => {
+      .map(([destPath, sourcePath, modifier = identity, filter = accept]: FilterableSchemaEntry) => {
         const value = get(source, sourcePath);
-        if (strictMode && value === undefined) throw `Mappet: ${sourcePath} not found`;
+        if (strictMode && value === undefined) {
+          throw `Mappet: ${sourcePath} not found`;
+        }
         return [destPath, value, modifier, filter];
       })
-      .filter(([destPath, value, modifier, filter]: [string, any, Modifier, Filter]) =>
-        filter(value, source))
-      .map(([destPath, value, modifier]: [string, any, Modifier]) =>
-        [destPath, modifier(value, source)])
-      .reduce((akk: Result, [destPath, value]: [string, any]) =>
-        set(akk, destPath, value), {});
+      .filter(([_destPath, value, _modifier, filter]: [string, any, Modifier, Filter]) => filter(value, source))
+      .map(([destPath, value, modifier]: [string, any, Modifier]) => [destPath, modifier(value, source)])
+      .reduce((akk: Result, [destPath, value]: [string, any]) => set(akk, destPath, value), {});
   };
 }

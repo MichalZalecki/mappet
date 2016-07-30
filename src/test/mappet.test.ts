@@ -1,5 +1,5 @@
 import * as tape from "tape";
-import mappet, { Modifier, Schema, Filter, Source, Result } from "../lib/mappet";
+import mappet, { Filter, Modifier, Result, Schema, Source } from "../lib/mappet";
 import * as moment from "moment";
 
 function simpleMapping(t: tape.Test) {
@@ -35,7 +35,7 @@ function notFoundAsUndefined(t: tape.Test) {
     first_name: "Michal",
   };
   const actual = mapper(source);
-  const expected: {[key:string]: any} = {
+  const expected: {[key: string]: any} = {
     firstName: "Michal",
     lastName: undefined,
   };
@@ -59,29 +59,34 @@ function thorwErrorOnNotFound(t: tape.Test) {
 }
 
 function modifyEntry(t: tape.Test) {
-  const emptyStringToNull:Modifier = v => v === "" ? null : v;
-  const upperCase:Modifier = v => v.toUpperCase();
+  const emptyStringToNull: Modifier = v => v === "" ? null : v;
+  const upperCase: Modifier = v => v.toUpperCase();
 
   const schema: Schema  = [
     ["firstName", "first_name", upperCase],
     ["lastName", "last_name", emptyStringToNull],
   ];
   const mapper = mappet(schema, true);
-  const source:Source = {
+  const source: Source = {
     first_name: "Michal",
     last_name: "",
   };
   const actual = mapper(source);
-  const expected:Result = {
+  const expected: Result = {
     firstName: "MICHAL",
-    lastName: null
+    lastName: null,
   };
   t.deepEqual(actual, expected, "allows for modifing an entry with modifier");
 }
 
 function modifyEntryBasedOnSource(t: tape.Test) {
-  const formatDate: Modifier = (date, source) =>
-    source["country"] === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
+  interface MySource {
+    country: string;
+    date: string;
+  }
+
+  const formatDate: Modifier = (date: string, source: MySource) =>
+    source.country === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
 
   const schema: Schema = [
     ["country", "country"],
@@ -96,7 +101,7 @@ function modifyEntryBasedOnSource(t: tape.Test) {
   const actualUS = mapper(sourceUS);
   const expectedUS = {
     country: "us",
-    date: "07/30/16"
+    date: "07/30/16",
   };
   t.deepEqual(actualUS, expectedUS, "allows for mapping depending on source");
 
@@ -107,33 +112,39 @@ function modifyEntryBasedOnSource(t: tape.Test) {
   const actualGB = mapper(sourceGB);
   const expectedGB = {
     country: "gb",
-    date: "30/07/16"
+    date: "30/07/16",
   };
   t.deepEqual(actualGB, expectedGB, "allows for mapping depending on source");
 }
 
 function filterEntry(t: tape.Test) {
-  const skipNull:Filter = v => v === null ? false : true;
+  const skipNull: Filter = v => v === null ? false : true;
 
   const schema: Schema  = [
     ["firstName", "first_name", undefined, skipNull],
     ["lastName", "last_name", undefined, skipNull],
   ];
   const mapper = mappet(schema, true);
-  const source:Source = {
+  const source: Source = {
     first_name: "Michal",
     last_name: null,
   };
   const actual = mapper(source);
-  const expected:Result = {
+  const expected: Result = {
     firstName: "Michal",
   };
   t.deepEqual(actual, expected, "allows for filtering an entry with filter");
 }
 
 function filterBasedOnSource(t: tape.Test) {
-  const skipIfNotAGift: Filter = (value, source) => source["isGift"];
-  const skipIfGift: Filter = (value, source) => !source["isGift"];
+  interface MySource {
+    quantity: number;
+    isGift: boolean;
+    gift: { message: string, remind_before_renewing: boolean };
+  }
+
+  const skipIfNotAGift: Filter = (value: any, source: MySource) => source.isGift;
+  const skipIfGift: Filter = (value: any, source: MySource) => !source.isGift;
   const mapToNull: Modifier = () => null;
 
   const schema: Schema = [
@@ -193,7 +204,7 @@ function composeMappers(t: tape.Test) {
     items: [
       { first_name: "Michal", last_name: "Zalecki" },
       { first_name: "Foo", last_name: "Bar" },
-    ]
+    ],
   };
   const actual = usersMapper(source);
   const expected = {

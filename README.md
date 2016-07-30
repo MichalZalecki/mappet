@@ -162,4 +162,4 @@ const source = {
 * [x] Pass all values as 2. param to modifier
 * [x] ~~Get rid of lodash dependency~~ Import only `lodash/get` and `lodash/set`
 * [x] Use UMD modules format (mappet.standalone.js is standalone umd module)
-* [ ] Add linting
+* [x] Add linting
