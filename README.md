@@ -10,7 +10,7 @@ Lightweight, composable mappers for object transformations/normalization.
 [Examples](#examples)
 ***
 
-## Installation
+## Installation ([npm](https://www.npmjs.com/package/mappet))
 
 ```
 npm i -S mappet
