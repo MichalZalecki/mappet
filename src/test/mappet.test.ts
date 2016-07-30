@@ -1,110 +1,219 @@
 import * as tape from "tape";
-import mappet, { Modifier, Schema, Filter } from "../lib/mappet";
+import mappet, { Modifier, Schema, Filter, Source, Result } from "../lib/mappet";
+import * as moment from "moment";
 
-function simpleMappingTest(t: tape.Test) {
+function simpleMapping(t: tape.Test) {
+  const schema: Schema  = [
+    ["firstName", "first_name"],
+    ["lastName", "last_name"],
+    ["cardNumber", "card.number"],
+  ];
+  const mapper = mappet(schema);
+  const source = {
+    first_name: "Michal",
+    last_name: "Zalecki",
+    card: {
+      number: "5555-5555-5555-4444",
+    },
+  };
+  const actual = mapper(source);
+  const expected = {
+    firstName: "Michal",
+    lastName: "Zalecki",
+    cardNumber: "5555-5555-5555-4444",
+  };
+  t.deepEqual(actual, expected, "performs simple mapping based on schema");
+}
+
+function notFoundAsUndefined(t: tape.Test) {
   const simpleSchema: Schema  = [
     ["firstName", "first_name"],
     ["lastName", "last_name"],
-    ["cardNumber", "card.number"],
   ];
-  const simpleMapper = mappet(simpleSchema);
+  const mapper = mappet(simpleSchema);
   const source = {
     first_name: "Michal",
-    card: {
-      number: "5555-5555-5555-4444",
-    },
   };
-
-  t.deepEqual(simpleMapper(source), {
+  const actual = mapper(source);
+  const expected: {[key:string]: any} = {
     firstName: "Michal",
     lastName: undefined,
-    cardNumber: "5555-5555-5555-4444",
-  }, "performs simple mapping");
+  };
+  t.deepEqual(actual, expected, "not found source elements are undefined");
 }
 
-function skipingFieldsTest(t: tape.Test) {
-  const simpleSchema: Schema = [
+function thorwErrorOnNotFound(t: tape.Test) {
+  const schema: Schema  = [
     ["firstName", "first_name"],
     ["lastName", "last_name"],
-    ["cardNumber", "card.number"],
   ];
-  const skipUndefined: Filter = (dest, value, modifier) => value !== undefined;
-  const skipUndefinedMapper = mappet(simpleSchema, skipUndefined);
+  const mapper = mappet(schema, true);
   const source = {
     first_name: "Michal",
-    card: {
-      number: "5555-5555-5555-4444",
-    },
   };
-
-  t.deepEqual(skipUndefinedMapper(source), {
-    firstName: "Michal",
-    cardNumber: "5555-5555-5555-4444",
-  }, "allows for skipping values according to filter functor");
+  t.throws(
+    () => { mapper(source); },
+    /Mappet: last_name not found/,
+    "throw on not found in strictMode"
+  );
 }
 
-function modifyingFieldsTest(t: tape.Test) {
-  const uppercase: Modifier = text => text.toUpperCase();
-  const nullToEmptyString: Modifier = value => value === null ? "" : value;
-  const uppercaseSchema: Schema = [
-    ["firstName", "first_name", uppercase],
-    ["age", "age"],
-    ["nickname", "nickname", nullToEmptyString],
-  ];
-  const uppercaseMapper = mappet(uppercaseSchema);
-  const source: Object = {
-    first_name: "Michal",
-    age: 21,
-    nickname: null,
-    card: {
-      number: "5555-5555-5555-4444",
-    },
-  };
+function modifyEntry(t: tape.Test) {
+  const emptyStringToNull:Modifier = v => v === "" ? null : v;
+  const upperCase:Modifier = v => v.toUpperCase();
 
-  t.deepEqual(uppercaseMapper(source), {
+  const schema: Schema  = [
+    ["firstName", "first_name", upperCase],
+    ["lastName", "last_name", emptyStringToNull],
+  ];
+  const mapper = mappet(schema, true);
+  const source:Source = {
+    first_name: "Michal",
+    last_name: "",
+  };
+  const actual = mapper(source);
+  const expected:Result = {
     firstName: "MICHAL",
-    age: 21,
-    nickname: "",
-  }, "allows for per field modification");
+    lastName: null
+  };
+  t.deepEqual(actual, expected, "allows for modifing an entry with modifier");
 }
 
-function composingMappersTest(t: tape.Test) {
-  const commentSchema: Schema = [
-    ["nickname", "nickname"],
-    ["upvotesCount", "upvotes_count"]
+function modifyEntryBasedOnSource(t: tape.Test) {
+  const formatDate: Modifier = (date, source) =>
+    source["country"] === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
+
+  const schema: Schema = [
+    ["country", "country"],
+    ["date", "date", formatDate],
   ];
-  const commentMapper = mappet(commentSchema);
-  const blogSchema: Schema = [
-    ["title", "title"],
-    ["createdAt", "meta.created_at"],
-    ["comments", "comments", comments => comments.map(commentMapper)],
+  const mapper = mappet(schema);
+
+  const sourceUS = {
+    country: "us",
+    date: "2016-07-30",
+  };
+  const actualUS = mapper(sourceUS);
+  const expectedUS = {
+    country: "us",
+    date: "07/30/16"
+  };
+  t.deepEqual(actualUS, expectedUS, "allows for mapping depending on source");
+
+  const sourceGB = {
+    country: "gb",
+    date: "2016-07-30",
+  };
+  const actualGB = mapper(sourceGB);
+  const expectedGB = {
+    country: "gb",
+    date: "30/07/16"
+  };
+  t.deepEqual(actualGB, expectedGB, "allows for mapping depending on source");
+}
+
+function filterEntry(t: tape.Test) {
+  const skipNull:Filter = v => v === null ? false : true;
+
+  const schema: Schema  = [
+    ["firstName", "first_name", undefined, skipNull],
+    ["lastName", "last_name", undefined, skipNull],
   ];
-  const blogMapper = mappet(blogSchema);
-  const source = {
-    title: "Foo Bar",
-    meta: {
-      created_at: "2016-12-12 0:00"
+  const mapper = mappet(schema, true);
+  const source:Source = {
+    first_name: "Michal",
+    last_name: null,
+  };
+  const actual = mapper(source);
+  const expected:Result = {
+    firstName: "Michal",
+  };
+  t.deepEqual(actual, expected, "allows for filtering an entry with filter");
+}
+
+function filterBasedOnSource(t: tape.Test) {
+  const skipIfNotAGift: Filter = (value, source) => source["isGift"];
+  const skipIfGift: Filter = (value, source) => !source["isGift"];
+  const mapToNull: Modifier = () => null;
+
+  const schema: Schema = [
+    ["quantity", "quantity"],
+    ["gift.message", "giftMessage", undefined, skipIfNotAGift],
+    ["gift.remind_before_renewing", "remindBeforeRenewingGift", undefined, skipIfNotAGift],
+    ["gift", "gift", mapToNull, skipIfGift],
+  ];
+
+  const mapper = mappet(schema);
+
+  const sourceNotGift: Source = {
+    quantity: 3,
+    isGift: false,
+    giftMessage: "All best!",
+    remindBeforeRenewingGift: true,
+  };
+  const actualNotGift = mapper(sourceNotGift);
+  const expectedNotGift: Result = {
+    quantity: 3,
+    gift: null,
+  };
+  t.deepEqual(actualNotGift, expectedNotGift, "allows for filtering depending on source");
+
+  const sourceGift: Source = {
+    quantity: 3,
+    isGift: true,
+    giftMessage: "All best!",
+    remindBeforeRenewingGift: true,
+  };
+  const actualGift = mapper(sourceGift);
+  const expectedGift: Result = {
+    quantity: 3,
+    gift: {
+      message: "All best!",
+      remind_before_renewing: true,
     },
-    comments: [
-     { nickname: "Foo", upvotes_count: 10, created_at: "2016-12-12 1:00" },
-     { nickname: "Bar", upvotes_count: 20, created_at: "2016-12-12 2:00" },
+  };
+  t.deepEqual(actualGift, expectedGift, "allows for filtering depending on source");
+}
+
+function composeMappers(t: tape.Test) {
+  const userSchema: Schema = [
+    ["firstName", "first_name"],
+    ["lastName", "last_name"],
+  ];
+  const userMapper = mappet(userSchema);
+
+  const usersSchema: Schema = [
+    ["totalCount", "total_count"],
+    ["users", "items", users => users.map(userMapper)],
+  ];
+  const usersMapper = mappet(usersSchema);
+
+  const source = {
+    total_count: 5,
+    items: [
+      { first_name: "Michal", last_name: "Zalecki" },
+      { first_name: "Foo", last_name: "Bar" },
+    ]
+  };
+  const actual = usersMapper(source);
+  const expected = {
+    totalCount: 5,
+    users: [
+      { firstName: "Michal", lastName: "Zalecki" },
+      { firstName: "Foo", lastName: "Bar" },
     ],
   };
-
-  t.deepEqual(blogMapper(source), {
-    title: "Foo Bar",
-    createdAt: "2016-12-12 0:00",
-    comments: [
-     { nickname: "Foo", upvotesCount: 10 },
-     { nickname: "Bar", upvotesCount: 20 },
-    ],
-  }, "allows for composing mappers")
+  t.deepEqual(actual, expected, "allows for composing mappers");
 }
 
 tape("mappet", (t: tape.Test) => {
-  t.plan(4);
-  simpleMappingTest(t);
-  skipingFieldsTest(t);
-  modifyingFieldsTest(t);
-  composingMappersTest(t);
+  t.plan(10);
+  simpleMapping(t);
+  notFoundAsUndefined(t);
+  thorwErrorOnNotFound(t);
+  modifyEntry(t);
+  modifyEntryBasedOnSource(t);
+  filterEntry(t);
+  filterBasedOnSource(t);
+  composeMappers(t);
 });

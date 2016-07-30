@@ -157,8 +157,8 @@ const source = {
 
 ## TODO v1.0.0
 
-* [ ] Strict checks mode - throw error when source value is undefined (breaking change)
-* [ ] Per entry filter instead of per mapper (breaking change)
+* [x] Strict checks mode - throw error when source value is undefined (breaking change)
+* [x] Per entry filter instead of per mapper (breaking change)
 * [ ] Pass all values as 2. param to modifier
 * [ ] Get rid of lodash dependency
 * [ ] Use UMD modules format

@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/MichalZalecki/mappet#readme",
   "devDependencies": {
+    "moment": "^2.14.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.5.1",
     "typescript": "^1.8.10"

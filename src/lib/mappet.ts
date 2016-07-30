@@ -1,43 +1,61 @@
 import { get, set } from "lodash";
 
+/*
+ * Source interface for defining mapper input object
+ */
+export interface Source {
+  [key: string]: any;
+}
+
+/*
+ * Result interface for defining mapper output object
+ */
+export interface Result {
+  [key: string]: any;
+}
+
 /**
- * Modifier function interface to optionaly change mapped value
+ * Modifier function interface to change mapped value
  *
- * @param value - Value to be changed
+ * @param value - Value from source object
+ * @param source - Source
  */
 export interface Modifier {
-  (value: any): any;
+  (value: any, source: Source): any;
 }
 
 /**
- * Filter function interface to make it possible to omit certain entries
+ * Filter function interface to make it possible to omit entry
  *
- * @param dest - Path to destination entry
  * @param value - Value from source object
- * @param modifier - Modifier function
+ * @param source - Source
  */
 export interface Filter {
-  (dest: string, value: any, modifier: Modifier): boolean;
+  (value: any, source: Source): boolean;
 }
 
 /**
- * Mapper function interface that accepts object and returns mapped
- * object based on schema passed to mappet
+ * Mapper function interface that accepts Source object and returns Result object
+ * by transformations according to Schema passed to mappet
  *
  * @param source - Source object to be mapped
- * @returns Mapped object
+ * @returns Result
  */
 export interface Mapper {
-  (source: Object): Object;
+  (source: Source): Result;
 }
 
-export type SourceEntry = [string, any, Modifier];
-export type SchemaEntry = [string, string];
+export type BasicSchemaEntry = [string, string];
 export type ModifiableSchemaEntry = [string, string, Modifier];
-export type Schema = Array<SchemaEntry | ModifiableSchemaEntry>;
+export type FilterableSchemaEntry = [string, string, Modifier, Filter];
+
+/*
+ * Schema type for defining schema for mappet
+ */
+export type Schema = [BasicSchemaEntry | ModifiableSchemaEntry | FilterableSchemaEntry];
 
 /**
- * Identity return passed value
+ * Default modifier function which returns passed value without any modifications
  *
  * @param value - Value which will be returned
  */
@@ -59,15 +77,19 @@ function accept(...args: Array<any>): boolean {
  * @param filter - Determine whether entry should be keept or omitted
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, filter: Filter = accept): Mapper {
-  return (object: Object) => {
+export default function mappet(schema: Schema, strictMode: boolean = false): Mapper {
+  return (source: Source) => {
     return schema
-      .map(([dest, source, modifier = identity]: ModifiableSchemaEntry) =>
-        [dest, get(object, source), modifier])
-      .filter((args: SourceEntry) => filter.apply(this, args))
-      .reduce((akk: Object, entry: SourceEntry) => {
-        const [dest, value, modifier] = entry;
-        return set(akk, dest, modifier(value));
-      }, {});
+      .map(([destPath, sourcePath, modifier=identity, filter=accept]: FilterableSchemaEntry) => {
+        const value = get(source, sourcePath);
+        if (strictMode && value === undefined) throw `Mappet: ${sourcePath} not found`;
+        return [destPath, value, modifier, filter];
+      })
+      .filter(([destPath, value, modifier, filter]: [string, any, Modifier, Filter]) =>
+        filter(value, source))
+      .map(([destPath, value, modifier]: [string, any, Modifier]) =>
+        [destPath, modifier(value, source)])
+      .reduce((akk: Result, [destPath, value]: [string, any]) =>
+        set(akk, destPath, value), {});
   };
 }

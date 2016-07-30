@@ -1,35 +1,41 @@
+export interface Source {
+    [key: string]: any;
+}
+export interface Result {
+    [key: string]: any;
+}
 /**
- * Modifier function interface to optionaly change mapped value
+ * Modifier function interface to change mapped value
  *
- * @param value - Value to be changed
+ * @param value - Value from source object
+ * @param source - Source
  */
 export interface Modifier {
-    (value: any): any;
+    (value: any, source: Source): any;
 }
 /**
- * Filter function interface to make it possible to omit certain entries
+ * Filter function interface to make it possible to omit entry
  *
- * @param dest - Path to destination entry
  * @param value - Value from source object
- * @param modifier - Modifier function
+ * @param source - Source
  */
 export interface Filter {
-    (dest: string, value: any, modifier: Modifier): boolean;
+    (value: any, source: Source): boolean;
 }
 /**
- * Mapper function interface that accepts object and returns mapped
- * object based on schema passed to mappet
+ * Mapper function interface that accepts Source object and returns Result object
+ * by transformations according to Schema passed to mappet
  *
  * @param source - Source object to be mapped
- * @returns Mapped object
+ * @returns Result
  */
 export interface Mapper {
-    (source: Object): Object;
+    (source: Source): Result;
 }
-export declare type SourceEntry = [string, any, Modifier];
-export declare type SchemaEntry = [string, string];
+export declare type BasicSchemaEntry = [string, string];
 export declare type ModifiableSchemaEntry = [string, string, Modifier];
-export declare type Schema = Array<SchemaEntry | ModifiableSchemaEntry>;
+export declare type FilterableSchemaEntry = [string, string, Modifier, Filter];
+export declare type Schema = [BasicSchemaEntry | ModifiableSchemaEntry | FilterableSchemaEntry];
 /**
  * Factory for creating mappers functions
  *
@@ -37,4 +43,4 @@ export declare type Schema = Array<SchemaEntry | ModifiableSchemaEntry>;
  * @param filter - Determine whether entry should be keept or omitted
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, filter?: Filter): Mapper;
+export default function mappet(schema: Schema, strictMode?: boolean): Mapper;

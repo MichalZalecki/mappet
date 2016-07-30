@@ -1,103 +1,198 @@
 "use strict";
 var tape = require("tape");
 var mappet_1 = require("../lib/mappet");
-function simpleMappingTest(t) {
-    var simpleSchema = [
+var moment = require("moment");
+function simpleMapping(t) {
+    var schema = [
         ["firstName", "first_name"],
         ["lastName", "last_name"],
         ["cardNumber", "card.number"],
     ];
-    var simpleMapper = mappet_1.default(simpleSchema);
+    var mapper = mappet_1.default(schema);
     var source = {
         first_name: "Michal",
+        last_name: "Zalecki",
         card: {
             number: "5555-5555-5555-4444",
         },
     };
-    t.deepEqual(simpleMapper(source), {
+    var actual = mapper(source);
+    var expected = {
+        firstName: "Michal",
+        lastName: "Zalecki",
+        cardNumber: "5555-5555-5555-4444",
+    };
+    t.deepEqual(actual, expected, "performs simple mapping based on schema");
+}
+function notFoundAsUndefined(t) {
+    var simpleSchema = [
+        ["firstName", "first_name"],
+        ["lastName", "last_name"],
+    ];
+    var mapper = mappet_1.default(simpleSchema);
+    var source = {
+        first_name: "Michal",
+    };
+    var actual = mapper(source);
+    var expected = {
         firstName: "Michal",
         lastName: undefined,
-        cardNumber: "5555-5555-5555-4444",
-    }, "performs simple mapping");
+    };
+    t.deepEqual(actual, expected, "not found source elements are undefined");
 }
-function skipingFieldsTest(t) {
-    var simpleSchema = [
+function thorwErrorOnNotFound(t) {
+    var schema = [
         ["firstName", "first_name"],
         ["lastName", "last_name"],
-        ["cardNumber", "card.number"],
     ];
-    var skipUndefined = function (dest, value, modifier) { return value !== undefined; };
-    var skipUndefinedMapper = mappet_1.default(simpleSchema, skipUndefined);
+    var mapper = mappet_1.default(schema, true);
     var source = {
         first_name: "Michal",
-        card: {
-            number: "5555-5555-5555-4444",
-        },
     };
-    t.deepEqual(skipUndefinedMapper(source), {
-        firstName: "Michal",
-        cardNumber: "5555-5555-5555-4444",
-    }, "allows for skipping values according to filter functor");
+    t.throws(function () { mapper(source); }, /Mappet: last_name not found/, "throw on not found in strictMode");
 }
-function modifyingFieldsTest(t) {
-    var uppercase = function (text) { return text.toUpperCase(); };
-    var nullToEmptyString = function (value) { return value === null ? "" : value; };
-    var uppercaseSchema = [
-        ["firstName", "first_name", uppercase],
-        ["age", "age"],
-        ["nickname", "nickname", nullToEmptyString],
+function modifyEntry(t) {
+    var emptyStringToNull = function (v) { return v === "" ? null : v; };
+    var upperCase = function (v) { return v.toUpperCase(); };
+    var schema = [
+        ["firstName", "first_name", upperCase],
+        ["lastName", "last_name", emptyStringToNull],
     ];
-    var uppercaseMapper = mappet_1.default(uppercaseSchema);
+    var mapper = mappet_1.default(schema, true);
     var source = {
         first_name: "Michal",
-        age: 21,
-        nickname: null,
-        card: {
-            number: "5555-5555-5555-4444",
-        },
+        last_name: "",
     };
-    t.deepEqual(uppercaseMapper(source), {
+    var actual = mapper(source);
+    var expected = {
         firstName: "MICHAL",
-        age: 21,
-        nickname: "",
-    }, "allows for per field modification");
+        lastName: null
+    };
+    t.deepEqual(actual, expected, "allows for modifing an entry with modifier");
 }
-function composingMappersTest(t) {
-    var commentSchema = [
-        ["nickname", "nickname"],
-        ["upvotesCount", "upvotes_count"]
+function modifyEntryBasedOnSource(t) {
+    var formatDate = function (date, source) {
+        return source["country"] === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
+    };
+    var schema = [
+        ["country", "country"],
+        ["date", "date", formatDate],
     ];
-    var commentMapper = mappet_1.default(commentSchema);
-    var blogSchema = [
-        ["title", "title"],
-        ["createdAt", "meta.created_at"],
-        ["comments", "comments", function (comments) { return comments.map(commentMapper); }],
+    var mapper = mappet_1.default(schema);
+    var sourceUS = {
+        country: "us",
+        date: "2016-07-30",
+    };
+    var actualUS = mapper(sourceUS);
+    var expectedUS = {
+        country: "us",
+        date: "07/30/16"
+    };
+    t.deepEqual(actualUS, expectedUS, "allows for mapping depending on source");
+    var sourceGB = {
+        country: "gb",
+        date: "2016-07-30",
+    };
+    var actualGB = mapper(sourceGB);
+    var expectedGB = {
+        country: "gb",
+        date: "30/07/16"
+    };
+    t.deepEqual(actualGB, expectedGB, "allows for mapping depending on source");
+}
+function filterEntry(t) {
+    var skipNull = function (v) { return v === null ? false : true; };
+    var schema = [
+        ["firstName", "first_name", undefined, skipNull],
+        ["lastName", "last_name", undefined, skipNull],
     ];
-    var blogMapper = mappet_1.default(blogSchema);
+    var mapper = mappet_1.default(schema, true);
     var source = {
-        title: "Foo Bar",
-        meta: {
-            created_at: "2016-12-12 0:00"
+        first_name: "Michal",
+        last_name: null,
+    };
+    var actual = mapper(source);
+    var expected = {
+        firstName: "Michal",
+    };
+    t.deepEqual(actual, expected, "allows for filtering an entry with filter");
+}
+function filterBasedOnSource(t) {
+    var skipIfNotAGift = function (value, source) { return source["isGift"]; };
+    var skipIfGift = function (value, source) { return !source["isGift"]; };
+    var mapToNull = function () { return null; };
+    var schema = [
+        ["quantity", "quantity"],
+        ["gift.message", "giftMessage", undefined, skipIfNotAGift],
+        ["gift.remind_before_renewing", "remindBeforeRenewingGift", undefined, skipIfNotAGift],
+        ["gift", "gift", mapToNull, skipIfGift],
+    ];
+    var mapper = mappet_1.default(schema);
+    var sourceNotGift = {
+        quantity: 3,
+        isGift: false,
+        giftMessage: "All best!",
+        remindBeforeRenewingGift: true,
+    };
+    var actualNotGift = mapper(sourceNotGift);
+    var expectedNotGift = {
+        quantity: 3,
+        gift: null,
+    };
+    t.deepEqual(actualNotGift, expectedNotGift, "allows for filtering depending on source");
+    var sourceGift = {
+        quantity: 3,
+        isGift: true,
+        giftMessage: "All best!",
+        remindBeforeRenewingGift: true,
+    };
+    var actualGift = mapper(sourceGift);
+    var expectedGift = {
+        quantity: 3,
+        gift: {
+            message: "All best!",
+            remind_before_renewing: true,
         },
-        comments: [
-            { nickname: "Foo", upvotes_count: 10, created_at: "2016-12-12 1:00" },
-            { nickname: "Bar", upvotes_count: 20, created_at: "2016-12-12 2:00" },
+    };
+    t.deepEqual(actualGift, expectedGift, "allows for filtering depending on source");
+}
+function composeMappers(t) {
+    var userSchema = [
+        ["firstName", "first_name"],
+        ["lastName", "last_name"],
+    ];
+    var userMapper = mappet_1.default(userSchema);
+    var usersSchema = [
+        ["totalCount", "total_count"],
+        ["users", "items", function (users) { return users.map(userMapper); }],
+    ];
+    var usersMapper = mappet_1.default(usersSchema);
+    var source = {
+        total_count: 5,
+        items: [
+            { first_name: "Michal", last_name: "Zalecki" },
+            { first_name: "Foo", last_name: "Bar" },
+        ]
+    };
+    var actual = usersMapper(source);
+    var expected = {
+        totalCount: 5,
+        users: [
+            { firstName: "Michal", lastName: "Zalecki" },
+            { firstName: "Foo", lastName: "Bar" },
         ],
     };
-    t.deepEqual(blogMapper(source), {
-        title: "Foo Bar",
-        createdAt: "2016-12-12 0:00",
-        comments: [
-            { nickname: "Foo", upvotesCount: 10 },
-            { nickname: "Bar", upvotesCount: 20 },
-        ],
-    }, "allows for composing mappers");
+    t.deepEqual(actual, expected, "allows for composing mappers");
 }
 tape("mappet", function (t) {
-    t.plan(4);
-    simpleMappingTest(t);
-    skipingFieldsTest(t);
-    modifyingFieldsTest(t);
-    composingMappersTest(t);
+    t.plan(10);
+    simpleMapping(t);
+    notFoundAsUndefined(t);
+    thorwErrorOnNotFound(t);
+    modifyEntry(t);
+    modifyEntryBasedOnSource(t);
+    filterEntry(t);
+    filterBasedOnSource(t);
+    composeMappers(t);
 });
 //# sourceMappingURL=mappet.test.js.map
