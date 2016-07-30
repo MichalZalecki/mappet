@@ -9,7 +9,7 @@
     "build:watch": "tsc -w",
     "test": "node test/mappet.test.js | tap-spec",
     "doc": "typedoc --out doc src/lib/mappet.ts",
-    "clean": "rm -rf doc lib"
+    "clean": "rm -rf doc lib test"
   },
   "repository": {
     "type": "git",
