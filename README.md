@@ -160,6 +160,6 @@ const source = {
 * [x] Strict checks mode - throw error when source value is undefined (breaking change)
 * [x] Per entry filter instead of per mapper (breaking change)
 * [x] Pass all values as 2. param to modifier
-* [ ] Get rid of lodash dependency
-* [ ] Use UMD modules format
+* [x] ~~Get rid of lodash dependency~~ Import only `lodash/get` and `lodash/set`
+* [x] Use UMD modules format (mappet.standalone.js is standalone umd module)
 * [ ] Add linting
