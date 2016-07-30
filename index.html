@@ -69,9 +69,7 @@
 				<p><a href="https://circleci.com/gh/MichalZalecki/mappet"><img src="https://circleci.com/gh/MichalZalecki/mappet.svg?style=svg" alt="CircleCI"></a></p>
 				<p>Lightweight, composable mappers for object transformations/normalization.</p>
 				<hr>
-				<p><a href="https://michalzalecki.github.io/mappet">API Docs</a>
-					|
-				<a href="#examples">Examples</a></p>
+				<p><a href="https://michalzalecki.github.io/mappet">API Docs</a> | <a href="#examples">Examples</a></p>
 				<hr>
 				<h2 id="installation-npm-https-www-npmjs-com-package-mappet-">Installation (<a href="https://www.npmjs.com/package/mappet">npm</a>)</h2>
 				<pre><code>npm <span class="hljs-selector-tag">i</span> -S mappet
@@ -84,132 +82,116 @@
 					<li>Per field modifications e.g. <code>null</code> to empty string to make React inputs happy</li>
 				</ul>
 				<h2 id="examples">Examples</h2>
-				<h3 id="simple-transformation">Simple transformation</h3>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> simpleSchema = [
-  <span class="hljs-comment">// ["path.to.destination", "path.to.source"]</span>
+				<h3 id="basic">Basic</h3>
+				<p>Simple value to value transformation</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema  = [
   [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
-  [<span class="hljs-string">"lastName"</span>, <span class="hljs-string">"last_name"</span>],
   [<span class="hljs-string">"cardNumber"</span>, <span class="hljs-string">"card.number"</span>],
 ];
-
-<span class="hljs-keyword">const</span> simpleMapper = mappet(simpleSchema);
-
+<span class="hljs-keyword">const</span> mapper = mappet(schema);
 <span class="hljs-keyword">const</span> source = {
   first_name: <span class="hljs-string">"Michal"</span>,
+  last_name: <span class="hljs-string">"Zalecki"</span>,
   card: {
     number: <span class="hljs-string">"5555-5555-5555-4444"</span>,
   },
 };
-
-<span class="hljs-keyword">const</span> result = simpleMapper(source);
-
-<span class="hljs-comment">//  {</span>
-<span class="hljs-comment">//    firstName: "Michal",</span>
-<span class="hljs-comment">//    lastName: undefined,</span>
-<span class="hljs-comment">//    cardNumber: "5555-5555-5555-4444",</span>
-<span class="hljs-comment">//  }</span>
+<span class="hljs-keyword">const</span> result = mapper(source);
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//   firstName: "Michal",</span>
+<span class="hljs-comment">//   cardNumber: "5555-5555-5555-4444",</span>
+<span class="hljs-comment">// }</span>
 </code></pre>
-				<h3 id="skip-undefined-fields">Skip undefined fields</h3>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> simpleSchema = [
+				<h3 id="mapping-values">Mapping values</h3>
+				<p>Third element of schema entry is modifier which allows for mapping values. Modifier accepts current
+				value and entire, original source object.</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> formatDate = (date, source) =&gt; moment(date).format(source.country === <span class="hljs-string">"us"</span> ? <span class="hljs-string">"MM/DD/YY"</span> : <span class="hljs-string">"DD/MM/YY"</span>);
+<span class="hljs-keyword">const</span> upperCase = v =&gt; v.toUpperCase();
+
+<span class="hljs-keyword">const</span> schema = [
+  [<span class="hljs-string">"country"</span>, <span class="hljs-string">"country"</span>, upperCase],
+  [<span class="hljs-string">"date"</span>, <span class="hljs-string">"date"</span>, formatDate],
+];
+<span class="hljs-keyword">const</span> mapper = mappet(schema);
+<span class="hljs-keyword">const</span> source = {
+  country: <span class="hljs-string">"gb"</span>,
+  date: <span class="hljs-string">"2016-07-30"</span>,
+};
+<span class="hljs-keyword">const</span> result = mapper(sourceUS);
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//   country: "GB",</span>
+<span class="hljs-comment">//   date: "30/07/16",</span>
+<span class="hljs-comment">// }</span>
+</code></pre>
+				<h3 id="filtering-entries">Filtering entries</h3>
+				<p>Fourth element of schema entry is filter which allows for omitting entry based on its value or
+				entire, original source object.</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> skipIfNotAGift = (value, source) =&gt; source.isGift;
+<span class="hljs-keyword">const</span> skipIfGift = (value, source) =&gt; !source.isGift;
+<span class="hljs-keyword">const</span> mapToNull = () =&gt; <span class="hljs-literal">null</span>;
+
+<span class="hljs-keyword">const</span> schema = [
+  [<span class="hljs-string">"quantity"</span>, <span class="hljs-string">"quantity"</span>],
+  [<span class="hljs-string">"gift.message"</span>, <span class="hljs-string">"giftMessage"</span>, <span class="hljs-literal">undefined</span>, skipIfNotAGift],
+  [<span class="hljs-string">"gift.remind_before_renewing"</span>, <span class="hljs-string">"remindBeforeRenewingGift"</span>, <span class="hljs-literal">undefined</span>, skipIfNotAGift],
+  [<span class="hljs-string">"gift"</span>, <span class="hljs-string">"gift"</span>, mapToNull, skipIfGift],
+];
+<span class="hljs-keyword">const</span> mapper = mappet(schema);
+<span class="hljs-keyword">const</span> source = {
+  quantity: <span class="hljs-number">3</span>,
+  isGift: <span class="hljs-literal">false</span>,
+  giftMessage: <span class="hljs-string">"All best!"</span>,
+  remindBeforeRenewingGift: <span class="hljs-literal">true</span>,
+};
+<span class="hljs-keyword">const</span> result ,= mapper(sourceNotGift);
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//   quantity: 3,</span>
+<span class="hljs-comment">//   gift: null,</span>
+<span class="hljs-comment">// };</span>
+</code></pre>
+				<h3 id="composing-mappers">Composing mappers</h3>
+				<p>Mappers are just clojures. It&#39;s easy to combine them using modifiers.</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> userSchema = [
   [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
   [<span class="hljs-string">"lastName"</span>, <span class="hljs-string">"last_name"</span>],
-  [<span class="hljs-string">"cardNumber"</span>, <span class="hljs-string">"card.number"</span>],
 ];
+<span class="hljs-keyword">const</span> userMapper = mappet(userSchema);
 
-<span class="hljs-keyword">const</span> skipUndefined = (dest, value, modifier) =&gt; value !== <span class="hljs-literal">undefined</span>;
-
-<span class="hljs-keyword">const</span> skipUndefinedMapper = mappet(simpleSchema, skipUndefined);
+<span class="hljs-keyword">const</span> usersSchema = [
+  [<span class="hljs-string">"totalCount"</span>, <span class="hljs-string">"total_count"</span>],
+  [<span class="hljs-string">"users"</span>, <span class="hljs-string">"items"</span>, users =&gt; users.map(userMapper)],
+];
+<span class="hljs-keyword">const</span> usersMapper = mappet(usersSchema);
 
 <span class="hljs-keyword">const</span> source = {
-  first_name: <span class="hljs-string">"Michal"</span>,
-  card: {
-    number: <span class="hljs-string">"5555-5555-5555-4444"</span>,
-  },
-};
-
-<span class="hljs-keyword">const</span> result = skipUndefinedMapper(source);
-
-<span class="hljs-comment">//  {</span>
-<span class="hljs-comment">//    firstName: "Michal",</span>
-<span class="hljs-comment">//    cardNumber: "5555-5555-5555-4444"</span>
-<span class="hljs-comment">//  }</span>
-</code></pre>
-				<h3 id="per-field-modification">Per field modification</h3>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> uppercase = text =&gt; text.toUpperCase();
-
-<span class="hljs-keyword">const</span> nullToEmptyString = value =&gt; value === <span class="hljs-literal">null</span> ? <span class="hljs-string">""</span> : value;
-
-<span class="hljs-keyword">const</span> uppercaseSchema = [
-  <span class="hljs-comment">// ["path.to.destination", "path.to.source", modifierFn]</span>
-  [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>, uppercase],
-  [<span class="hljs-string">"age"</span>, <span class="hljs-string">"age"</span>],
-  [<span class="hljs-string">"nickname"</span>, <span class="hljs-string">"nickname"</span>, nullToEmptyString],
-];
-
-<span class="hljs-keyword">const</span> uppercaseMapper = mappet(uppercaseSchema);
-
-<span class="hljs-keyword">const</span> source = {
-  first_name: <span class="hljs-string">"Michal"</span>,
-  age: <span class="hljs-number">21</span>,
-  nickname: <span class="hljs-literal">null</span>,
-  card: {
-    number: <span class="hljs-string">"5555-5555-5555-4444"</span>,
-  },
-};
-
-<span class="hljs-keyword">const</span> result = uppercaseMapper(source);
-
-<span class="hljs-comment">//  {</span>
-<span class="hljs-comment">//    firstName: "MICHAL",</span>
-<span class="hljs-comment">//    age: 21,</span>
-<span class="hljs-comment">//    nickname: ""</span>
-<span class="hljs-comment">//  }</span>
-</code></pre>
-				<h3 id="mappers-composition">Mappers composition</h3>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> commentSchema = [
-  [<span class="hljs-string">"nickname"</span>, <span class="hljs-string">"nickname"</span>],
-  [<span class="hljs-string">"upvotesCount"</span>, <span class="hljs-string">"upvotes_count"</span>]
-];
-
-<span class="hljs-keyword">const</span> commentMapper = mappet(commentSchema);
-
-<span class="hljs-keyword">const</span> blogSchema = [
-  [<span class="hljs-string">"title"</span>, <span class="hljs-string">"title"</span>],
-  [<span class="hljs-string">"createdAt"</span>, <span class="hljs-string">"meta.created_at"</span>, date =&gt; moment(date)],
-  [<span class="hljs-string">"comments"</span>, <span class="hljs-string">"comments"</span>, comments =&gt; comments.map(commentMapper)],
-];
-
-<span class="hljs-keyword">const</span> blogMapper = mappet(blogSchema);
-
-<span class="hljs-keyword">const</span> source = {
-  title: <span class="hljs-string">"Foo Bar"</span>,
-  meta: {
-    created_at: <span class="hljs-string">"2016-12-12 0:00"</span>
-  },
-  comments: [
-    { nickname: <span class="hljs-string">"Foo"</span>, upvotes_count: <span class="hljs-number">10</span>, created_at: <span class="hljs-string">"2016-12-12 1:00"</span> },
-    { nickname: <span class="hljs-string">"Bar"</span>, upvotes_count: <span class="hljs-number">20</span>, created_at: <span class="hljs-string">"2016-12-12 2:00"</span> },
+  total_count: <span class="hljs-number">5</span>,
+  items: [
+    { first_name: <span class="hljs-string">"Michal"</span>, last_name: <span class="hljs-string">"Zalecki"</span> },
+    { first_name: <span class="hljs-string">"Foo"</span>, last_name: <span class="hljs-string">"Bar"</span> },
   ],
 };
-
-<span class="hljs-comment">//  {</span>
-<span class="hljs-comment">//    title: "Foo Bar",</span>
-<span class="hljs-comment">//    createdAt: Moment {_isAMomentObject: true, _i: "2016-12-12 0:00", ...},</span>
-<span class="hljs-comment">//    comments: [</span>
-<span class="hljs-comment">//     { nickname: "Foo", upvotesCount: 10 },</span>
-<span class="hljs-comment">//     { nickname: "Bar", upvotesCount: 20 },</span>
-<span class="hljs-comment">//    ]</span>
-<span class="hljs-comment">//  }</span>
+<span class="hljs-keyword">const</span> result = usersMapper(source);
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//   totalCount: 5,</span>
+<span class="hljs-comment">//   users: [</span>
+<span class="hljs-comment">//     { firstName: "Michal", lastName: "Zalecki" },</span>
+<span class="hljs-comment">//     { firstName: "Foo", lastName: "Bar" },</span>
+<span class="hljs-comment">//   ],</span>
+<span class="hljs-comment">// }</span>
 </code></pre>
-				<h2 id="todo-v1-0-0">TODO v1.0.0</h2>
-				<ul>
-					<li>[x] Strict checks mode - throw error when source value is undefined (breaking change)</li>
-					<li>[x] Per entry filter instead of per mapper (breaking change)</li>
-					<li>[ ] Pass all values as 2. param to modifier</li>
-					<li>[ ] Get rid of lodash dependency</li>
-					<li>[ ] Use UMD modules format</li>
-					<li>[ ] Add linting</li>
-				</ul>
+				<h3 id="strict-mode">Strict mode</h3>
+				<p>Mappers in strict mode will throw exception when value is not found on source object.</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema  = [
+  [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
+  [<span class="hljs-string">"lastName"</span>, <span class="hljs-string">"last_name"</span>],
+];
+<span class="hljs-keyword">const</span> mapper = mappet(schema);
+<span class="hljs-keyword">const</span> source = {
+  first_name: <span class="hljs-string">"Michal"</span>,
+};
+<span class="hljs-keyword">const</span> result = mapper(source);
+<span class="hljs-comment">// Uncaught Mappet: last_name not found</span>
+</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
