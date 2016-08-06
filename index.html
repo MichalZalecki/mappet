@@ -185,7 +185,7 @@
   [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
   [<span class="hljs-string">"lastName"</span>, <span class="hljs-string">"last_name"</span>],
 ];
-<span class="hljs-keyword">const</span> mapper = mappet(schema);
+<span class="hljs-keyword">const</span> mapper = mappet(schema, { strictMode: <span class="hljs-literal">true</span> });
 <span class="hljs-keyword">const</span> source = {
   first_name: <span class="hljs-string">"Michal"</span>,
 };
