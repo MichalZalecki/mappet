@@ -38,6 +38,19 @@ export interface Filter {
 export interface Mapper {
     (source: Source): Result;
 }
+/**
+ * Options for modifying behaviour of the mapper
+ */
+export interface MappetOptions {
+    /**
+     * Set to `true` to enable strict mode
+     *
+     * ~~~
+     * const mapper = mappet(schema, { strictMode: true })
+     * ~~~
+     */
+    strictMode?: boolean;
+}
 export declare type BasicSchemaEntry = [string, string];
 export declare type ModifiableSchemaEntry = [string, string, Modifier];
 export declare type FilterableSchemaEntry = [string, string, Modifier, Filter];
@@ -46,7 +59,7 @@ export declare type Schema = [BasicSchemaEntry | ModifiableSchemaEntry | Filtera
  * Factory for creating mappers functions
  *
  * @param schema - Mapper schema
- * @param filter - Determine whether entry should be keept or omitted
+ * @param options - Mapper configuration
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, strictMode?: boolean): Mapper;
+export default function mappet(schema: Schema, options?: MappetOptions): Mapper;

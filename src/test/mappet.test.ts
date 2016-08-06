@@ -47,7 +47,7 @@ function thorwErrorOnNotFound(t: tape.Test) {
     ["firstName", "first_name"],
     ["lastName", "last_name"],
   ];
-  const mapper = mappet(schema, true);
+  const mapper = mappet(schema, { strictMode: true });
   const source = {
     first_name: "Michal",
   };
@@ -66,7 +66,7 @@ function modifyEntry(t: tape.Test) {
     ["firstName", "first_name", upperCase],
     ["lastName", "last_name", emptyStringToNull],
   ];
-  const mapper = mappet(schema, true);
+  const mapper = mappet(schema);
   const source: Source = {
     first_name: "Michal",
     last_name: "",
@@ -124,7 +124,7 @@ function filterEntry(t: tape.Test) {
     ["firstName", "first_name", undefined, skipNull],
     ["lastName", "last_name", undefined, skipNull],
   ];
-  const mapper = mappet(schema, true);
+  const mapper = mappet(schema);
   const source: Source = {
     first_name: "Michal",
     last_name: null,

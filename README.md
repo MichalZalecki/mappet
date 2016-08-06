@@ -146,7 +146,7 @@ const schema  = [
   ["firstName", "first_name"],
   ["lastName", "last_name"],
 ];
-const mapper = mappet(schema);
+const mapper = mappet(schema, { strictMode: true });
 const source = {
   first_name: "Michal",
 };

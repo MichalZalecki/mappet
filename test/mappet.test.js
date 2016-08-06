@@ -45,7 +45,7 @@ function thorwErrorOnNotFound(t) {
         ["firstName", "first_name"],
         ["lastName", "last_name"],
     ];
-    var mapper = mappet_1.default(schema, true);
+    var mapper = mappet_1.default(schema, { strictMode: true });
     var source = {
         first_name: "Michal",
     };
@@ -58,7 +58,7 @@ function modifyEntry(t) {
         ["firstName", "first_name", upperCase],
         ["lastName", "last_name", emptyStringToNull],
     ];
-    var mapper = mappet_1.default(schema, true);
+    var mapper = mappet_1.default(schema);
     var source = {
         first_name: "Michal",
         last_name: "",
@@ -106,7 +106,7 @@ function filterEntry(t) {
         ["firstName", "first_name", undefined, skipNull],
         ["lastName", "last_name", undefined, skipNull],
     ];
-    var mapper = mappet_1.default(schema, true);
+    var mapper = mappet_1.default(schema);
     var source = {
         first_name: "Michal",
         last_name: null,

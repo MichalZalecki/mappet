@@ -46,6 +46,20 @@ export interface Mapper {
   (source: Source): Result;
 }
 
+/**
+ * Options for modifying behaviour of the mapper
+ */
+export interface MappetOptions {
+  /**
+   * Set to `true` to enable strict mode
+   *
+   * ~~~
+   * const mapper = mappet(schema, { strictMode: true })
+   * ~~~
+   */
+  strictMode?: boolean;
+}
+
 export type BasicSchemaEntry = [string, string];
 export type ModifiableSchemaEntry = [string, string, Modifier];
 export type FilterableSchemaEntry = [string, string, Modifier, Filter];
@@ -75,10 +89,11 @@ function accept(...args: Array<any>): boolean {
  * Factory for creating mappers functions
  *
  * @param schema - Mapper schema
- * @param filter - Determine whether entry should be keept or omitted
+ * @param options - Mapper configuration
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, strictMode: boolean = false): Mapper {
+export default function mappet(schema: Schema, options: MappetOptions = { strictMode: false }): Mapper {
+  const { strictMode } = options;
   return (source: Source) => {
     return schema
       .map(([destPath, sourcePath, modifier = identity, filter = accept]: FilterableSchemaEntry) => {
