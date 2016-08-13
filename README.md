@@ -96,7 +96,7 @@ const source = {
   giftMessage: "All best!",
   remindBeforeRenewingGift: true,
 };
-const result ,= mapper(sourceNotGift);
+const result = mapper(sourceNotGift);
 // {
 //   quantity: 3,
 //   gift: null,
@@ -153,3 +153,9 @@ const source = {
 const result = mapper(source);
 // Uncaught Mappet: last_name not found
 ```
+
+
+## TODO
+
+* Filter before throwing error in strict mode
+* Optional mapper name for better error message in strict mode
