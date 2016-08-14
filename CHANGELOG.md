@@ -1,8 +1,13 @@
 # CHANGELOG
 
+## 2.0.0
+
+*  Stop throwing when entry is filtered out (breaking change)
+*  Add `name` option to set custom mapper name
+
 ## 1.1.0
 
-* Introduce options object (breaking change)
+* Introduce options object
 
 ## 1.0.0
 
