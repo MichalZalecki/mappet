@@ -154,7 +154,10 @@ const result = mapper(source);
 // Uncaught Mappet: last_name not found
 ```
 
-## TODO
+You can specify mapper name for easier debugging.
 
-- [x] Optional mapper name for better error message in strict mode
-- [x] Filter before throwing error in strict mode
+```js
+const userMapper = mappet(schema, { strictMode: true, name: "User Mapper" });
+const user = mapper(source);
+// Uncaught User Mapper: last_name not found
+```
