@@ -58,6 +58,21 @@ function thorwErrorOnNotFound(t: tape.Test) {
   );
 }
 
+function doNotThorwWhenFilteredOut(t: tape.Test) {
+  const schema: Schema  = [
+    ["firstName", "first_name"],
+    ["lastName", "last_name", undefined, () => false],
+  ];
+  const mapper = mappet(schema, { strictMode: true });
+  const source = {
+    first_name: "Michal",
+  };
+  t.doesNotThrow(
+    () => { mapper(source); },
+    "does not throw when entry should be filtered out"
+  );
+}
+
 function customMapperName(t: tape.Test) {
   const schema: Schema  = [
     ["firstName", "first_name"],
@@ -234,10 +249,11 @@ function composeMappers(t: tape.Test) {
 }
 
 tape("mappet", (t: tape.Test) => {
-  t.plan(11);
+  t.plan(12);
   simpleMapping(t);
   notFoundAsUndefined(t);
   thorwErrorOnNotFound(t);
+  doNotThorwWhenFilteredOut(t);
   customMapperName(t);
   modifyEntry(t);
   modifyEntryBasedOnSource(t);

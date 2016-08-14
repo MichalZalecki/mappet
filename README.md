@@ -157,4 +157,4 @@ const result = mapper(source);
 ## TODO
 
 - [x] Optional mapper name for better error message in strict mode
-- [] Filter before throwing error in strict mode
+- [x] Filter before throwing error in strict mode

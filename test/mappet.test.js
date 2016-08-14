@@ -51,6 +51,17 @@ function thorwErrorOnNotFound(t) {
     };
     t.throws(function () { mapper(source); }, /Mappet: last_name not found/, "throw on not found in strictMode");
 }
+function doNotThorwWhenFilteredOut(t) {
+    var schema = [
+        ["firstName", "first_name"],
+        ["lastName", "last_name", undefined, function () { return false; }],
+    ];
+    var mapper = mappet_1.default(schema, { strictMode: true });
+    var source = {
+        first_name: "Michal",
+    };
+    t.doesNotThrow(function () { mapper(source); }, "does not throw when entry should be filtered out");
+}
 function customMapperName(t) {
     var schema = [
         ["firstName", "first_name"],
@@ -196,10 +207,11 @@ function composeMappers(t) {
     t.deepEqual(actual, expected, "allows for composing mappers");
 }
 tape("mappet", function (t) {
-    t.plan(11);
+    t.plan(12);
     simpleMapping(t);
     notFoundAsUndefined(t);
     thorwErrorOnNotFound(t);
+    doNotThorwWhenFilteredOut(t);
     customMapperName(t);
     modifyEntry(t);
     modifyEntryBasedOnSource(t);
