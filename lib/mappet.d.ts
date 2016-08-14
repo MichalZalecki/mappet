@@ -64,6 +64,7 @@ export interface MappetOptions {
 export declare type BasicSchemaEntry = [string, string];
 export declare type ModifiableSchemaEntry = [string, string, Modifier];
 export declare type FilterableSchemaEntry = [string, string, Modifier, Filter];
+export declare type WithValueSchemaEntry = [string, string, Modifier, Filter, any];
 export declare type Schema = [BasicSchemaEntry | ModifiableSchemaEntry | FilterableSchemaEntry];
 /**
  * Factory for creating mappers functions

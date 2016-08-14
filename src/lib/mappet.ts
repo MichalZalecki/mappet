@@ -74,6 +74,7 @@ export interface MappetOptions {
 export type BasicSchemaEntry = [string, string];
 export type ModifiableSchemaEntry = [string, string, Modifier];
 export type FilterableSchemaEntry = [string, string, Modifier, Filter];
+export type WithValueSchemaEntry = [string, string, Modifier, Filter, any];
 
 /*
  * Schema type for defining schema for mappet
@@ -92,7 +93,7 @@ function identity<T>(value: T): T {
 /**
  * Default filter function which accepts each entry
  */
-function accept(...args: Array<any>): boolean {
+function always(...args: Array<any>): boolean {
   return true;
 }
 
@@ -107,15 +108,17 @@ export default function mappet(schema: Schema, options: MappetOptions = {}): Map
   const { strictMode = false, name = "Mappet" } = options;
   return (source: Source) => {
     return schema
-      .map(([destPath, sourcePath, modifier = identity, filter = accept]: FilterableSchemaEntry) => {
+      .map(([destPath, sourcePath, modifier = identity, filter = always]: FilterableSchemaEntry) => {
         const value = get(source, sourcePath);
+        return [destPath, sourcePath, modifier, filter, value];
+      })
+      .filter(([_destPath, _sourcePath, _modifier, filter, value]: WithValueSchemaEntry) => filter(value, source))
+      .map(([destPath, sourcePath, modifier, _filter, value]: WithValueSchemaEntry) => {
         if (strictMode && value === undefined) {
           throw `${name}: ${sourcePath} not found`;
         }
-        return [destPath, value, modifier, filter];
+        return [destPath, modifier(value, source)];
       })
-      .filter(([_destPath, value, _modifier, filter]: [string, any, Modifier, Filter]) => filter(value, source))
-      .map(([destPath, value, modifier]: [string, any, Modifier]) => [destPath, modifier(value, source)])
       .reduce((akk: Result, [destPath, value]: [string, any]) => set(akk, destPath, value), {});
   };
 }
