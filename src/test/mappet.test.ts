@@ -58,6 +58,22 @@ function thorwErrorOnNotFound(t: tape.Test) {
   );
 }
 
+function customMapperName(t: tape.Test) {
+  const schema: Schema  = [
+    ["firstName", "first_name"],
+    ["lastName", "last_name"],
+  ];
+  const myMapper = mappet(schema, { strictMode: true, name: "myMapper" });
+  const source = {
+    first_name: "Michal",
+  };
+  t.throws(
+    () => { myMapper(source); },
+    /myMapper: last_name not found/,
+    "sets custom mapper name for easier debugging"
+  );
+}
+
 function modifyEntry(t: tape.Test) {
   const emptyStringToNull: Modifier = v => v === "" ? null : v;
   const upperCase: Modifier = v => v.toUpperCase();
@@ -218,10 +234,11 @@ function composeMappers(t: tape.Test) {
 }
 
 tape("mappet", (t: tape.Test) => {
-  t.plan(10);
+  t.plan(11);
   simpleMapping(t);
   notFoundAsUndefined(t);
   thorwErrorOnNotFound(t);
+  customMapperName(t);
   modifyEntry(t);
   modifyEntryBasedOnSource(t);
   filterEntry(t);
