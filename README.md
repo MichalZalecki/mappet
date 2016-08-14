@@ -154,8 +154,7 @@ const result = mapper(source);
 // Uncaught Mappet: last_name not found
 ```
 
-
 ## TODO
 
-* Filter before throwing error in strict mode
-* Optional mapper name for better error message in strict mode
+- [x] Optional mapper name for better error message in strict mode
+- [] Filter before throwing error in strict mode

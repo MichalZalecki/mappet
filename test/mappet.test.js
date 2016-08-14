@@ -51,6 +51,17 @@ function thorwErrorOnNotFound(t) {
     };
     t.throws(function () { mapper(source); }, /Mappet: last_name not found/, "throw on not found in strictMode");
 }
+function customMapperName(t) {
+    var schema = [
+        ["firstName", "first_name"],
+        ["lastName", "last_name"],
+    ];
+    var myMapper = mappet_1.default(schema, { strictMode: true, name: "myMapper" });
+    var source = {
+        first_name: "Michal",
+    };
+    t.throws(function () { myMapper(source); }, /myMapper: last_name not found/, "sets custom mapper name for easier debugging");
+}
 function modifyEntry(t) {
     var emptyStringToNull = function (v) { return v === "" ? null : v; };
     var upperCase = function (v) { return v.toUpperCase(); };
@@ -185,10 +196,11 @@ function composeMappers(t) {
     t.deepEqual(actual, expected, "allows for composing mappers");
 }
 tape("mappet", function (t) {
-    t.plan(10);
+    t.plan(11);
     simpleMapping(t);
     notFoundAsUndefined(t);
     thorwErrorOnNotFound(t);
+    customMapperName(t);
     modifyEntry(t);
     modifyEntryBasedOnSource(t);
     filterEntry(t);

@@ -54,10 +54,21 @@ export interface MappetOptions {
    * Set to `true` to enable strict mode
    *
    * ~~~
-   * const mapper = mappet(schema, { strictMode: true })
+   * const mapper = mappet(schema, { strictMode: true });
    * ~~~
    */
   strictMode?: boolean;
+
+  /**
+   * Set custom mapper name used in error messages in strictMode for easier debugging.
+   *
+   * Defaults to `"Mappet"`.
+   *
+   * ~~~
+   * const mapper = mappet(schema, { strictMode: true, name: "UserMapper" });
+   * ~~~
+   */
+  name?: string;
 }
 
 export type BasicSchemaEntry = [string, string];
@@ -92,14 +103,14 @@ function accept(...args: Array<any>): boolean {
  * @param options - Mapper configuration
  * @returns Mapper function
  */
-export default function mappet(schema: Schema, options: MappetOptions = { strictMode: false }): Mapper {
-  const { strictMode } = options;
+export default function mappet(schema: Schema, options: MappetOptions = {}): Mapper {
+  const { strictMode = false, name = "Mappet" } = options;
   return (source: Source) => {
     return schema
       .map(([destPath, sourcePath, modifier = identity, filter = accept]: FilterableSchemaEntry) => {
         const value = get(source, sourcePath);
         if (strictMode && value === undefined) {
-          throw `Mappet: ${sourcePath} not found`;
+          throw `${name}: ${sourcePath} not found`;
         }
         return [destPath, value, modifier, filter];
       })

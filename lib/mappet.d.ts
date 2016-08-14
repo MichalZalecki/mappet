@@ -46,10 +46,20 @@ export interface MappetOptions {
      * Set to `true` to enable strict mode
      *
      * ~~~
-     * const mapper = mappet(schema, { strictMode: true })
+     * const mapper = mappet(schema, { strictMode: true });
      * ~~~
      */
     strictMode?: boolean;
+    /**
+     * Set custom mapper name used in error messages in strictMode for easier debugging.
+     *
+     * Defaults to `"Mappet"`.
+     *
+     * ~~~
+     * const mapper = mappet(schema, { strictMode: true, name: "UserMapper" });
+     * ~~~
+     */
+    name?: string;
 }
 export declare type BasicSchemaEntry = [string, string];
 export declare type ModifiableSchemaEntry = [string, string, Modifier];
