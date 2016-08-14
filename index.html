@@ -143,7 +143,7 @@
   giftMessage: <span class="hljs-string">"All best!"</span>,
   remindBeforeRenewingGift: <span class="hljs-literal">true</span>,
 };
-<span class="hljs-keyword">const</span> result ,= mapper(sourceNotGift);
+<span class="hljs-keyword">const</span> result = mapper(sourceNotGift);
 <span class="hljs-comment">// {</span>
 <span class="hljs-comment">//   quantity: 3,</span>
 <span class="hljs-comment">//   gift: null,</span>
@@ -191,6 +191,11 @@
 };
 <span class="hljs-keyword">const</span> result = mapper(source);
 <span class="hljs-comment">// Uncaught Mappet: last_name not found</span>
+</code></pre>
+				<p>You can specify mapper name for easier debugging.</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> userMapper = mappet(schema, { strictMode: <span class="hljs-literal">true</span>, name: <span class="hljs-string">"User Mapper"</span> });
+<span class="hljs-keyword">const</span> user = mapper(source);
+<span class="hljs-comment">// Uncaught User Mapper: last_name not found</span>
 </code></pre>
 			</div>
 		</div>
