@@ -161,3 +161,5 @@ const userMapper = mappet(schema, { strictMode: true, name: "User Mapper" });
 const user = mapper(source);
 // Uncaught User Mapper: last_name not found
 ```
+
+See [tests](src/test/mappet.test.ts) for more examples.
