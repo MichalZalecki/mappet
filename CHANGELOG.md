@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.1
+
+* Check strictMode for true
+
 ## 2.1.0
 
 * Add greedy mode
