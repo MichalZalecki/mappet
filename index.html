@@ -197,6 +197,25 @@
 <span class="hljs-keyword">const</span> user = mapper(source);
 <span class="hljs-comment">// Uncaught User Mapper: last_name not found</span>
 </code></pre>
+				<h3 id="greedy-mode">Greedy mode</h3>
+				<p>Mappers in greedy mode will copy all properties from source object.</p>
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema = [
+  [<span class="hljs-string">"last_name"</span>, <span class="hljs-string">"last_name"</span>, str =&gt; str.toUpperCase()],
+];
+<span class="hljs-keyword">const</span> mapper = mappet(schema, { greedyMode: <span class="hljs-literal">true</span> });
+<span class="hljs-keyword">const</span> source = {
+  first_name: <span class="hljs-string">"Michal"</span>,
+  last_name: <span class="hljs-string">"Zalecki"</span>,
+  email: <span class="hljs-string">"example@michalzalecki.com"</span>,
+};
+<span class="hljs-keyword">const</span> actual = mapper(source);
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//   first_name: "Michal",</span>
+<span class="hljs-comment">//   last_name: "ZALECKI",</span>
+<span class="hljs-comment">//   email: "example@michalzalecki.com",</span>
+<span class="hljs-comment">// }</span>
+</code></pre>
+				<p>See <a href="src/test/mappet.test.ts">tests</a> for more examples.</p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
