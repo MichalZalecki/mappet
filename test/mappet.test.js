@@ -222,7 +222,7 @@ function copyExistingProperties(t) {
         last_name: "ZALECKI",
         email: "example@michalzalecki.com",
     };
-    t.deepEqual(actual, expected, "add all existing properties in greedy mode");
+    t.deepEqual(actual, expected, "copy all existing properties in greedy mode");
 }
 tape("mappet", function (t) {
     t.plan(13);

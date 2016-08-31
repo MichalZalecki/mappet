@@ -126,7 +126,7 @@ export default function mappet(schema: Schema, options: MappetOptions = {}): Map
       })
       .filter(([_destPath, _sourcePath, _modifier, filter, value]: WithValueSchemaEntry) => filter(value, source))
       .map(([destPath, sourcePath, modifier, _filter, value]: WithValueSchemaEntry) => {
-        if (strictMode && value === undefined) {
+        if (strictMode === true && value === undefined) {
           throw `${name}: ${sourcePath} not found`;
         }
         return [destPath, modifier(value, source)];
