@@ -248,8 +248,28 @@ function composeMappers(t: tape.Test) {
   t.deepEqual(actual, expected, "allows for composing mappers");
 }
 
+function copyExistingProperties(t: tape.Test) {
+  const schema: Schema = [
+    ["last_name", "last_name", (str: string) => str.toUpperCase()],
+  ];
+  const mapper = mappet(schema, { greedyMode: true });
+
+  const source = {
+    first_name: "Michal",
+    last_name: "Zalecki",
+    email: "example@michalzalecki.com",
+  };
+  const actual = mapper(source);
+  const expected = {
+    first_name: "Michal",
+    last_name: "ZALECKI",
+    email: "example@michalzalecki.com",
+  };
+  t.deepEqual(actual, expected, "add all existing properties in greedy mode");
+}
+
 tape("mappet", (t: tape.Test) => {
-  t.plan(12);
+  t.plan(13);
   simpleMapping(t);
   notFoundAsUndefined(t);
   thorwErrorOnNotFound(t);
@@ -260,4 +280,5 @@ tape("mappet", (t: tape.Test) => {
   filterEntry(t);
   filterBasedOnSource(t);
   composeMappers(t);
+  copyExistingProperties(t);
 });

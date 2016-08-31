@@ -206,8 +206,26 @@ function composeMappers(t) {
     };
     t.deepEqual(actual, expected, "allows for composing mappers");
 }
+function copyExistingProperties(t) {
+    var schema = [
+        ["last_name", "last_name", function (str) { return str.toUpperCase(); }],
+    ];
+    var mapper = mappet_1.default(schema, { greedyMode: true });
+    var source = {
+        first_name: "Michal",
+        last_name: "Zalecki",
+        email: "example@michalzalecki.com",
+    };
+    var actual = mapper(source);
+    var expected = {
+        first_name: "Michal",
+        last_name: "ZALECKI",
+        email: "example@michalzalecki.com",
+    };
+    t.deepEqual(actual, expected, "add all existing properties in greedy mode");
+}
 tape("mappet", function (t) {
-    t.plan(12);
+    t.plan(13);
     simpleMapping(t);
     notFoundAsUndefined(t);
     thorwErrorOnNotFound(t);
@@ -218,5 +236,6 @@ tape("mappet", function (t) {
     filterEntry(t);
     filterBasedOnSource(t);
     composeMappers(t);
+    copyExistingProperties(t);
 });
 //# sourceMappingURL=mappet.test.js.map

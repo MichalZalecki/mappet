@@ -1,5 +1,6 @@
 import * as get from "lodash/get";
 import * as set from "lodash/set";
+import * as clone from "lodash/clone";
 
 /**
  * Source interface for defining mapper input object
@@ -60,6 +61,15 @@ export interface MappetOptions {
   strictMode?: boolean;
 
   /**
+   * Set to `true` to enable greedy mode
+   *
+   * ~~~
+   * const mapper = mappet(schema, { greedyMode: true });
+   * ~~~
+   */
+  greedyMode?: boolean;
+
+  /**
    * Set custom mapper name used in error messages in strictMode for easier debugging.
    *
    * Defaults to `"Mappet"`.
@@ -105,8 +115,10 @@ function always(...args: Array<any>): boolean {
  * @returns Mapper function
  */
 export default function mappet(schema: Schema, options: MappetOptions = {}): Mapper {
-  const { strictMode = false, name = "Mappet" } = options;
+  const { strictMode = false, greedyMode = false, name = "Mappet" } = options;
   return (source: Source) => {
+    const base = greedyMode === true ? clone(source) : {};
+
     return schema
       .map(([destPath, sourcePath, modifier = identity, filter = always]: FilterableSchemaEntry) => {
         const value = get(source, sourcePath);
@@ -119,6 +131,6 @@ export default function mappet(schema: Schema, options: MappetOptions = {}): Map
         }
         return [destPath, modifier(value, source)];
       })
-      .reduce((akk: Result, [destPath, value]: [string, any]) => set(akk, destPath, value), {});
+      .reduce((akk: Result, [destPath, value]: [string, any]) => set(akk, destPath, value), base);
   };
 }

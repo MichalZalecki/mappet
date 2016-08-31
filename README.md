@@ -162,4 +162,26 @@ const user = mapper(source);
 // Uncaught User Mapper: last_name not found
 ```
 
+### Greedy mode
+
+Mappers in greedy mode will copy all properties from source object.
+
+```js
+const schema = [
+  ["last_name", "last_name", str => str.toUpperCase()],
+];
+const mapper = mappet(schema, { greedyMode: true });
+const source = {
+  first_name: "Michal",
+  last_name: "Zalecki",
+  email: "example@michalzalecki.com",
+};
+const actual = mapper(source);
+// {
+//   first_name: "Michal",
+//   last_name: "ZALECKI",
+//   email: "example@michalzalecki.com",
+// }
+```
+
 See [tests](src/test/mappet.test.ts) for more examples.

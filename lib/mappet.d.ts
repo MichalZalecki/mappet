@@ -51,6 +51,14 @@ export interface MappetOptions {
      */
     strictMode?: boolean;
     /**
+     * Set to `true` to enable greedy mode
+     *
+     * ~~~
+     * const mapper = mappet(schema, { greedyMode: true });
+     * ~~~
+     */
+    greedyMode?: boolean;
+    /**
      * Set custom mapper name used in error messages in strictMode for easier debugging.
      *
      * Defaults to `"Mappet"`.
