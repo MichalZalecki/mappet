@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.0
+
+* Add greedy mode
+
 ## 2.0.0
 
 *  Stop throwing when entry is filtered out (breaking change)
