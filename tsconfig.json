@@ -12,7 +12,6 @@
     "pretty": true
   },
   "files": [
-    "./typings/index.d.ts",
     "./src/test/mappet.test.ts",
     "./src/lib/mappet.ts"
   ]
