@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.1.2
+
+* Update TypeScript to 2.0
+* Obtain declarations through npm instead of typings
+
 ## 2.1.1
 
 * Check strictMode for true
