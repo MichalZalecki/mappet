@@ -2,6 +2,11 @@
 
 ## 2.1.2
 
+* Update dependencies
+* Update tsconfig.json
+
+## 2.1.2
+
 * Update TypeScript to 2.0
 * Obtain declarations through npm instead of typings
 
