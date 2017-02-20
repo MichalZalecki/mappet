@@ -10,7 +10,6 @@
     "test": "node test/mappet.test.js | tap-spec",
     "doc": "typedoc --out doc src/lib/mappet.ts",
     "clean": "rm -rf doc lib test",
-    "bundle": "browserify lib/mappet.js -s mappet > lib/mappet.standalone.js",
     "lint": "tslint src/lib/* src/test/*"
   },
   "repository": {
@@ -24,8 +23,10 @@
   },
   "homepage": "https://github.com/MichalZalecki/mappet#readme",
   "devDependencies": {
+    "@types/lodash": "^4.14.52",
+    "@types/moment": "^2.13.0",
     "@types/tape": "^4.2.28",
-    "moment": "^2.14.1",
+    "moment": "^2.17.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0",
     "tslint": "^3.14.0",
@@ -36,8 +37,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.36",
-    "lodash": "^4.15.0"
+    "lodash": "^4.17.4"
   },
   "keywords": [
     "normalization",

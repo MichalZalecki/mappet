@@ -11,8 +11,10 @@
     "newLine": "LF",
     "pretty": true
   },
-  "files": [
-    "./src/test/mappet.test.ts",
-    "./src/lib/mappet.ts"
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

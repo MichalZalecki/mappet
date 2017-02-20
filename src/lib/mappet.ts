@@ -1,6 +1,4 @@
-import * as get from "lodash/get";
-import * as set from "lodash/set";
-import * as clone from "lodash/clone";
+import { get, set, clone } from "lodash";
 
 /**
  * Source interface for defining mapper input object
