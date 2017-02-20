@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.1.2
+## 2.2.0
 
 * Update dependencies
 * Update tsconfig.json
