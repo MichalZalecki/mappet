@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var tape = require("tape");
 var mappet_1 = require("../lib/mappet");
 var moment = require("moment");
