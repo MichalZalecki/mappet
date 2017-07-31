@@ -1,6 +1,6 @@
-const get = require("lodash/get");
-const set = require("lodash/set");
-const clone = require("lodash/clone");
+import get = require("lodash/get");
+import set = require("lodash/set");
+import clone = require("lodash/clone");
 
 /**
  * Source interface for defining mapper input object
