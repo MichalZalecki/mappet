@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.2.2
+
+* Cherry-pick lodash methods ([#5](https://github.com/MichalZalecki/mappet/pull/5), thanks to [bytewiz](https://github.com/bytewiz))
+
 ## 2.2.1
 
 * Update dependencies
