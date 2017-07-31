@@ -1,4 +1,6 @@
-import { get, set, clone } from "lodash";
+import get = require("lodash/get");
+import set = require("lodash/set");
+import clone = require("lodash/clone");
 
 /**
  * Source interface for defining mapper input object
