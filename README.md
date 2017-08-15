@@ -29,10 +29,10 @@ npm i -S mappet
 Simple value to value transformation
 
 ```js
-const schema  = [
-  ["firstName", "first_name"],
-  ["cardNumber", "card.number"],
-];
+const schema: = {
+  firstName: "first_name",
+  lastName: "last_name",
+};
 const mapper = mappet(schema);
 const source = {
   first_name: "Michal",
@@ -57,10 +57,10 @@ value and entire, original source object.
 const formatDate = (date, source) => moment(date).format(source.country === "us" ? "MM/DD/YY" : "DD/MM/YY");
 const upperCase = v => v.toUpperCase();
 
-const schema = [
-  ["country", "country", upperCase],
-  ["date", "date", formatDate],
-];
+const schema = {
+  country: ["country", upperCase],
+  date: ["date", formatDate],
+};
 const mapper = mappet(schema);
 const source = {
   country: "gb",
@@ -80,15 +80,14 @@ entire, original source object.
 
 ```js
 const skipIfNotAGift = (value, source) => source.isGift;
-const skipIfGift = (value, source) => !source.isGift;
-const mapToNull = () => null;
 
-const schema = [
-  ["quantity", "quantity"],
-  ["gift.message", "giftMessage", undefined, skipIfNotAGift],
-  ["gift.remind_before_renewing", "remindBeforeRenewingGift", undefined, skipIfNotAGift],
-  ["gift", "gift", mapToNull, skipIfGift],
-];
+const schema = {
+  quantity: ["quantity"],
+  gift: {
+    message: ["giftMessage", undefined, skipIfNotAGift],
+    remind_before_renewing: ["remindBeforeRenewingGift", undefined, skipIfNotAGift],
+  },
+};
 const mapper = mappet(schema);
 const source = {
   quantity: 3,
@@ -99,7 +98,6 @@ const source = {
 const result = mapper(sourceNotGift);
 // {
 //   quantity: 3,
-//   gift: null,
 // };
 ```
 
@@ -108,16 +106,16 @@ const result = mapper(sourceNotGift);
 Mappers are just clojures. It's easy to combine them using modifiers.
 
 ```js
-const userSchema = [
-  ["firstName", "first_name"],
-  ["lastName", "last_name"],
-];
+const userSchema = {
+  firstName: "first_name",
+  lastName: "last_name",
+};
 const userMapper = mappet(userSchema);
 
-const usersSchema = [
-  ["totalCount", "total_count"],
-  ["users", "items", users => users.map(userMapper)],
-];
+const usersSchema = {
+  totalCount: "total_count",
+  users: ["items", users => users.map(userMapper)],
+};
 const usersMapper = mappet(usersSchema);
 
 const source = {
@@ -142,10 +140,10 @@ const result = usersMapper(source);
 Mappers in strict mode will throw exception when value is not found on source object.
 
 ```js
-const schema  = [
-  ["firstName", "first_name"],
-  ["lastName", "last_name"],
-];
+const schema: = {
+  firstName: "first_name",
+  lastName: "last_name",
+};
 const mapper = mappet(schema, { strictMode: true });
 const source = {
   first_name: "Michal",
@@ -167,9 +165,9 @@ const user = mapper(source);
 Mappers in greedy mode will copy all properties from source object.
 
 ```js
-const schema = [
-  ["last_name", "last_name", str => str.toUpperCase()],
-];
+const schema = {
+  last_name: ["last_name", str => str.toUpperCase()],
+};
 const mapper = mappet(schema, { greedyMode: true });
 const source = {
   first_name: "Michal",
