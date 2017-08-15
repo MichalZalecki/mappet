@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.0.0
+
+* Change schema so its shape reflects its output
+
 ## 2.2.2
 
 * Cherry-pick lodash methods ([#5](https://github.com/MichalZalecki/mappet/pull/5), thanks to [bytewiz](https://github.com/bytewiz))
