@@ -31,7 +31,7 @@ Simple value to value transformation
 ```js
 const schema: = {
   firstName: "first_name",
-  lastName: "last_name",
+  cardNumber: "card.number",
 };
 const mapper = mappet(schema);
 const source = {
