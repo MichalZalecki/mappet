@@ -247,7 +247,7 @@ function composeMappers(t: tape.Test) {
 function copyExistingProperties(t: tape.Test) {
   const schema: Schema = {
     last_name: ["last_name", (str: string) => str.toUpperCase()],
-  }
+  };
   const mapper = mappet(schema, { greedyMode: true });
 
   const source = {
