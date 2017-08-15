@@ -2,6 +2,21 @@ import get = require("lodash/get");
 import set = require("lodash/set");
 import clone = require("lodash/clone");
 
+function flatten(object: { [key: string]: any }) {
+  const result: { [key: string]: any } = {};
+  function doFlatten(value: any , key = "") {
+    if (value.constructor === Object) {
+      Object.keys(value).forEach(k => {
+        doFlatten(value[k], key + "." + k);
+      });
+    } else {
+      result[key.substr(1)] = value;
+    }
+  }
+  doFlatten(object);
+  return result;
+}
+
 /**
  * Source interface for defining mapper input object
  */
@@ -81,15 +96,16 @@ export interface MappetOptions {
   name?: string;
 }
 
-export type BasicSchemaEntry = [string, string];
-export type ModifiableSchemaEntry = [string, string, Modifier];
-export type FilterableSchemaEntry = [string, string, Modifier, Filter];
-export type WithValueSchemaEntry = [string, string, Modifier, Filter, any];
+export type BasicSchemaEntry = [string];
+export type ModifiableSchemaEntry = [string, Modifier];
+export type FilterableSchemaEntry = [string, Modifier, Filter];
+export type WithValueSchemaEntry = [string, Modifier, Filter, any];
+export type Entry = string | BasicSchemaEntry | ModifiableSchemaEntry | FilterableSchemaEntry | Schema;
 
 /*
  * Schema type for defining schema for mappet
  */
-export type Schema = [BasicSchemaEntry | ModifiableSchemaEntry | FilterableSchemaEntry];
+export type Schema = { [key: string]: Entry };
 
 /**
  * Default modifier function which returns passed value without any modifications
@@ -116,16 +132,21 @@ function always(...args: Array<any>): boolean {
  */
 export default function mappet(schema: Schema, options: MappetOptions = {}): Mapper {
   const { strictMode = false, greedyMode = false, name = "Mappet" } = options;
+
+  const flat = flatten(schema);
+  const prepared = Object.keys(flat)
+    .map(path => typeof flat[path] === "string" ? [path, flat[path]] : [path, ...flat[path]]);
+
   return (source: Source) => {
     const base = greedyMode === true ? clone(source) : {};
 
-    return schema
-      .map(([destPath, sourcePath, modifier = identity, filter = always]: FilterableSchemaEntry) => {
+    return prepared
+      .map(([destPath, sourcePath, modifier = identity, filter = always]) => {
         const value = get(source, sourcePath);
         return [destPath, sourcePath, modifier, filter, value];
       })
-      .filter(([_destPath, _sourcePath, _modifier, filter, value]: WithValueSchemaEntry) => filter(value, source))
-      .map(([destPath, sourcePath, modifier, _filter, value]: WithValueSchemaEntry) => {
+      .filter(([_destPath, _sourcePath, _modifier, filter, value]) => filter(value, source))
+      .map(([destPath, sourcePath, modifier, _filter, value]) => {
         if (strictMode === true && value === undefined) {
           throw `${name}: ${sourcePath} not found`;
         }

@@ -3,11 +3,11 @@ import mappet, { Filter, Modifier, Result, Schema, Source } from "../lib/mappet"
 import * as moment from "moment";
 
 function simpleMapping(t: tape.Test) {
-  const schema: Schema  = [
-    ["firstName", "first_name"],
-    ["lastName", "last_name"],
-    ["cardNumber", "card.number"],
-  ];
+  const schema: Schema = {
+    firstName: "first_name",
+    lastName: "last_name",
+    cardNumber: "card.number",
+  };
   const mapper = mappet(schema);
   const source = {
     first_name: "Michal",
@@ -26,10 +26,10 @@ function simpleMapping(t: tape.Test) {
 }
 
 function notFoundAsUndefined(t: tape.Test) {
-  const simpleSchema: Schema  = [
-    ["firstName", "first_name"],
-    ["lastName", "last_name"],
-  ];
+  const simpleSchema: Schema = {
+    firstName: "first_name",
+    lastName: "last_name",
+  };
   const mapper = mappet(simpleSchema);
   const source = {
     first_name: "Michal",
@@ -43,10 +43,10 @@ function notFoundAsUndefined(t: tape.Test) {
 }
 
 function thorwErrorOnNotFound(t: tape.Test) {
-  const schema: Schema  = [
-    ["firstName", "first_name"],
-    ["lastName", "last_name"],
-  ];
+  const schema: Schema = {
+    firstName: "first_name",
+    lastName: "last_name",
+  };
   const mapper = mappet(schema, { strictMode: true });
   const source = {
     first_name: "Michal",
@@ -59,10 +59,10 @@ function thorwErrorOnNotFound(t: tape.Test) {
 }
 
 function doNotThorwWhenFilteredOut(t: tape.Test) {
-  const schema: Schema  = [
-    ["firstName", "first_name"],
-    ["lastName", "last_name", undefined, () => false],
-  ];
+  const schema: Schema = {
+    firstName: "first_name",
+    lastName: ["last_name", undefined, () => false],
+  };
   const mapper = mappet(schema, { strictMode: true });
   const source = {
     first_name: "Michal",
@@ -74,10 +74,10 @@ function doNotThorwWhenFilteredOut(t: tape.Test) {
 }
 
 function customMapperName(t: tape.Test) {
-  const schema: Schema  = [
-    ["firstName", "first_name"],
-    ["lastName", "last_name"],
-  ];
+  const schema: Schema = {
+    firstName: "first_name",
+    lastName: "last_name",
+  };
   const myMapper = mappet(schema, { strictMode: true, name: "myMapper" });
   const source = {
     first_name: "Michal",
@@ -92,11 +92,10 @@ function customMapperName(t: tape.Test) {
 function modifyEntry(t: tape.Test) {
   const emptyStringToNull: Modifier = v => v === "" ? null : v;
   const upperCase: Modifier = v => v.toUpperCase();
-
-  const schema: Schema  = [
-    ["firstName", "first_name", upperCase],
-    ["lastName", "last_name", emptyStringToNull],
-  ];
+  const schema: Schema = {
+    firstName: ["first_name", upperCase],
+    lastName: ["last_name", emptyStringToNull],
+  };
   const mapper = mappet(schema);
   const source: Source = {
     first_name: "Michal",
@@ -119,12 +118,12 @@ function modifyEntryBasedOnSource(t: tape.Test) {
   const formatDate: Modifier = (date: string, source: MySource) =>
     source.country === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
 
-  const schema: Schema = [
-    ["country", "country"],
-    ["date", "date", formatDate],
-  ];
-  const mapper = mappet(schema);
+  const schema: Schema = {
+    country: "country",
+    date: ["date", formatDate],
+  };
 
+  const mapper = mappet(schema);
   const sourceUS = {
     country: "us",
     date: "2016-07-30",
@@ -150,11 +149,10 @@ function modifyEntryBasedOnSource(t: tape.Test) {
 
 function filterEntry(t: tape.Test) {
   const skipNull: Filter = v => v === null ? false : true;
-
-  const schema: Schema  = [
-    ["firstName", "first_name", undefined, skipNull],
-    ["lastName", "last_name", undefined, skipNull],
-  ];
+  const schema: Schema  = {
+    firstName: ["first_name", undefined, skipNull],
+    lastName: ["last_name", undefined, skipNull],
+  };
   const mapper = mappet(schema);
   const source: Source = {
     first_name: "Michal",
@@ -175,15 +173,14 @@ function filterBasedOnSource(t: tape.Test) {
   }
 
   const skipIfNotAGift: Filter = (value: any, source: MySource) => source.isGift;
-  const skipIfGift: Filter = (value: any, source: MySource) => !source.isGift;
-  const mapToNull: Modifier = () => null;
 
-  const schema: Schema = [
-    ["quantity", "quantity"],
-    ["gift.message", "giftMessage", undefined, skipIfNotAGift],
-    ["gift.remind_before_renewing", "remindBeforeRenewingGift", undefined, skipIfNotAGift],
-    ["gift", "gift", mapToNull, skipIfGift],
-  ];
+  const schema: Schema = {
+    quantity: ["quantity"],
+    gift: {
+      message: ["giftMessage", undefined, skipIfNotAGift],
+      remind_before_renewing: ["remindBeforeRenewingGift", undefined, skipIfNotAGift],
+    },
+  };
 
   const mapper = mappet(schema);
 
@@ -196,7 +193,6 @@ function filterBasedOnSource(t: tape.Test) {
   const actualNotGift = mapper(sourceNotGift);
   const expectedNotGift: Result = {
     quantity: 3,
-    gift: null,
   };
   t.deepEqual(actualNotGift, expectedNotGift, "allows for filtering depending on source");
 
@@ -218,16 +214,16 @@ function filterBasedOnSource(t: tape.Test) {
 }
 
 function composeMappers(t: tape.Test) {
-  const userSchema: Schema = [
-    ["firstName", "first_name"],
-    ["lastName", "last_name"],
-  ];
+  const userSchema: Schema = {
+    firstName: "first_name",
+    lastName: "last_name",
+  };
   const userMapper = mappet(userSchema);
 
-  const usersSchema: Schema = [
-    ["totalCount", "total_count"],
-    ["users", "items", users => users.map(userMapper)],
-  ];
+  const usersSchema: Schema = {
+    totalCount: "total_count",
+    users: ["items", users => users.map(userMapper)],
+  };
   const usersMapper = mappet(usersSchema);
 
   const source = {
@@ -249,9 +245,9 @@ function composeMappers(t: tape.Test) {
 }
 
 function copyExistingProperties(t: tape.Test) {
-  const schema: Schema = [
-    ["last_name", "last_name", (str: string) => str.toUpperCase()],
-  ];
+  const schema: Schema = {
+    last_name: ["last_name", (str: string) => str.toUpperCase()],
+  }
   const mapper = mappet(schema, { greedyMode: true });
 
   const source = {

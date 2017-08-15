@@ -4,11 +4,11 @@ var tape = require("tape");
 var mappet_1 = require("../lib/mappet");
 var moment = require("moment");
 function simpleMapping(t) {
-    var schema = [
-        ["firstName", "first_name"],
-        ["lastName", "last_name"],
-        ["cardNumber", "card.number"],
-    ];
+    var schema = {
+        firstName: "first_name",
+        lastName: "last_name",
+        cardNumber: "card.number",
+    };
     var mapper = mappet_1.default(schema);
     var source = {
         first_name: "Michal",
@@ -26,10 +26,10 @@ function simpleMapping(t) {
     t.deepEqual(actual, expected, "performs simple mapping based on schema");
 }
 function notFoundAsUndefined(t) {
-    var simpleSchema = [
-        ["firstName", "first_name"],
-        ["lastName", "last_name"],
-    ];
+    var simpleSchema = {
+        firstName: "first_name",
+        lastName: "last_name",
+    };
     var mapper = mappet_1.default(simpleSchema);
     var source = {
         first_name: "Michal",
@@ -42,10 +42,10 @@ function notFoundAsUndefined(t) {
     t.deepEqual(actual, expected, "not found source elements are undefined");
 }
 function thorwErrorOnNotFound(t) {
-    var schema = [
-        ["firstName", "first_name"],
-        ["lastName", "last_name"],
-    ];
+    var schema = {
+        firstName: "first_name",
+        lastName: "last_name",
+    };
     var mapper = mappet_1.default(schema, { strictMode: true });
     var source = {
         first_name: "Michal",
@@ -53,10 +53,10 @@ function thorwErrorOnNotFound(t) {
     t.throws(function () { mapper(source); }, /Mappet: last_name not found/, "throw on not found in strictMode");
 }
 function doNotThorwWhenFilteredOut(t) {
-    var schema = [
-        ["firstName", "first_name"],
-        ["lastName", "last_name", undefined, function () { return false; }],
-    ];
+    var schema = {
+        firstName: "first_name",
+        lastName: ["last_name", undefined, function () { return false; }],
+    };
     var mapper = mappet_1.default(schema, { strictMode: true });
     var source = {
         first_name: "Michal",
@@ -64,10 +64,10 @@ function doNotThorwWhenFilteredOut(t) {
     t.doesNotThrow(function () { mapper(source); }, "does not throw when entry should be filtered out");
 }
 function customMapperName(t) {
-    var schema = [
-        ["firstName", "first_name"],
-        ["lastName", "last_name"],
-    ];
+    var schema = {
+        firstName: "first_name",
+        lastName: "last_name",
+    };
     var myMapper = mappet_1.default(schema, { strictMode: true, name: "myMapper" });
     var source = {
         first_name: "Michal",
@@ -77,10 +77,10 @@ function customMapperName(t) {
 function modifyEntry(t) {
     var emptyStringToNull = function (v) { return v === "" ? null : v; };
     var upperCase = function (v) { return v.toUpperCase(); };
-    var schema = [
-        ["firstName", "first_name", upperCase],
-        ["lastName", "last_name", emptyStringToNull],
-    ];
+    var schema = {
+        firstName: ["first_name", upperCase],
+        lastName: ["last_name", emptyStringToNull],
+    };
     var mapper = mappet_1.default(schema);
     var source = {
         first_name: "Michal",
@@ -97,10 +97,10 @@ function modifyEntryBasedOnSource(t) {
     var formatDate = function (date, source) {
         return source.country === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
     };
-    var schema = [
-        ["country", "country"],
-        ["date", "date", formatDate],
-    ];
+    var schema = {
+        country: "country",
+        date: ["date", formatDate],
+    };
     var mapper = mappet_1.default(schema);
     var sourceUS = {
         country: "us",
@@ -125,10 +125,10 @@ function modifyEntryBasedOnSource(t) {
 }
 function filterEntry(t) {
     var skipNull = function (v) { return v === null ? false : true; };
-    var schema = [
-        ["firstName", "first_name", undefined, skipNull],
-        ["lastName", "last_name", undefined, skipNull],
-    ];
+    var schema = {
+        firstName: ["first_name", undefined, skipNull],
+        lastName: ["last_name", undefined, skipNull],
+    };
     var mapper = mappet_1.default(schema);
     var source = {
         first_name: "Michal",
@@ -142,14 +142,13 @@ function filterEntry(t) {
 }
 function filterBasedOnSource(t) {
     var skipIfNotAGift = function (value, source) { return source.isGift; };
-    var skipIfGift = function (value, source) { return !source.isGift; };
-    var mapToNull = function () { return null; };
-    var schema = [
-        ["quantity", "quantity"],
-        ["gift.message", "giftMessage", undefined, skipIfNotAGift],
-        ["gift.remind_before_renewing", "remindBeforeRenewingGift", undefined, skipIfNotAGift],
-        ["gift", "gift", mapToNull, skipIfGift],
-    ];
+    var schema = {
+        quantity: ["quantity"],
+        gift: {
+            message: ["giftMessage", undefined, skipIfNotAGift],
+            remind_before_renewing: ["remindBeforeRenewingGift", undefined, skipIfNotAGift],
+        },
+    };
     var mapper = mappet_1.default(schema);
     var sourceNotGift = {
         quantity: 3,
@@ -160,7 +159,6 @@ function filterBasedOnSource(t) {
     var actualNotGift = mapper(sourceNotGift);
     var expectedNotGift = {
         quantity: 3,
-        gift: null,
     };
     t.deepEqual(actualNotGift, expectedNotGift, "allows for filtering depending on source");
     var sourceGift = {
@@ -180,15 +178,15 @@ function filterBasedOnSource(t) {
     t.deepEqual(actualGift, expectedGift, "allows for filtering depending on source");
 }
 function composeMappers(t) {
-    var userSchema = [
-        ["firstName", "first_name"],
-        ["lastName", "last_name"],
-    ];
+    var userSchema = {
+        firstName: "first_name",
+        lastName: "last_name",
+    };
     var userMapper = mappet_1.default(userSchema);
-    var usersSchema = [
-        ["totalCount", "total_count"],
-        ["users", "items", function (users) { return users.map(userMapper); }],
-    ];
+    var usersSchema = {
+        totalCount: "total_count",
+        users: ["items", function (users) { return users.map(userMapper); }],
+    };
     var usersMapper = mappet_1.default(usersSchema);
     var source = {
         total_count: 5,
@@ -208,9 +206,9 @@ function composeMappers(t) {
     t.deepEqual(actual, expected, "allows for composing mappers");
 }
 function copyExistingProperties(t) {
-    var schema = [
-        ["last_name", "last_name", function (str) { return str.toUpperCase(); }],
-    ];
+    var schema = {
+        last_name: ["last_name", function (str) { return str.toUpperCase(); }],
+    };
     var mapper = mappet_1.default(schema, { greedyMode: true });
     var source = {
         first_name: "Michal",
