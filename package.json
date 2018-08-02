@@ -7,10 +7,25 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
-    "test": "node test/mappet.test.js | tap-spec",
+    "test": "jest",
     "doc": "typedoc --out doc src/lib/mappet.ts",
     "clean": "rm -rf doc lib test",
     "lint": "tslint src/lib/* src/test/*"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "repository": {
     "type": "git",
@@ -23,20 +38,20 @@
   },
   "homepage": "https://github.com/MichalZalecki/mappet#readme",
   "devDependencies": {
-    "@types/lodash": "^4.14.71",
-    "@types/tape": "^4.2.28",
-    "moment": "^2.18.1",
-    "tap-spec": "^4.1.1",
-    "tape": "^4.6.0",
+    "@types/jest": "^23.3.1",
+    "@types/lodash": "^4.14.115",
+    "jest": "^23.4.2",
+    "moment": "^2.22.2",
+    "ts-jest": "^23.0.1",
     "tslint": "^3.14.0",
     "typedoc": "^0.4.4",
-    "typescript": "^2.3.2"
+    "typescript": "^3.0.1"
   },
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.10"
   },
   "keywords": [
     "normalization",

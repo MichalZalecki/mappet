@@ -152,6 +152,6 @@ export default function mappet(schema: Schema, options: MappetOptions = {}): Map
         }
         return [destPath, modifier(value, source)];
       })
-      .reduce((akk: Result, [destPath, value]: [string, any]) => set(akk, destPath, value), base);
+      .reduce((akk, [destPath, value]) => set(akk, destPath, value), base);
   };
 }
