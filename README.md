@@ -50,16 +50,15 @@ const result = mapper(source);
 
 ### Mapping values
 
-Third element of schema entry is modifier which allows for mapping values. Modifier accepts current
-value and entire, original source object.
+Schema entries can be also option objects of `path`, `modifier`, and `include`. Modifier accepts selected value and original source object.
 
 ```js
 const formatDate = (date, source) => moment(date).format(source.country === "us" ? "MM/DD/YY" : "DD/MM/YY");
 const upperCase = v => v.toUpperCase();
 
 const schema = {
-  country: ["country", upperCase],
-  date: ["date", formatDate],
+  country: { path: "country", modifier: upperCase },
+  date: { path: "date", modifier: formatDate },
 };
 const mapper = mappet(schema);
 const source = {
@@ -75,18 +74,15 @@ const result = mapper(sourceUS);
 
 ### Filtering entries
 
-Fourth element of schema entry is filter which allows for omitting entry based on its value or
-entire, original source object.
+Using `include` you can control which values should be keept and what dropped.
 
 ```js
-const skipIfNotAGift = (value, source) => source.isGift;
+const isNotGit = (value, source) => !source.isGift;
 
 const schema = {
   quantity: ["quantity"],
-  gift: {
-    message: ["giftMessage", undefined, skipIfNotAGift],
-    remind_before_renewing: ["remindBeforeRenewingGift", undefined, skipIfNotAGift],
-  },
+  message: { path: "giftMessage", include: isNotGit },
+  remind_before_renewing: { path: "remindBeforeRenewingGift", include: isNotGit },
 };
 const mapper = mappet(schema);
 const source = {
@@ -114,7 +110,7 @@ const userMapper = mappet(userSchema);
 
 const usersSchema = {
   totalCount: "total_count",
-  users: ["items", users => users.map(userMapper)],
+  users: { path: "items", modifier: users => users.map(userMapper) },
 };
 const usersMapper = mappet(usersSchema);
 
