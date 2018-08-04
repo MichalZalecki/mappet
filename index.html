@@ -7,7 +7,6 @@
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
-	<script src="assets/js/modernizr.js"></script>
 </head>
 <body>
 <header>
@@ -71,7 +70,7 @@
 				<hr>
 				<p><a href="https://michalzalecki.github.io/mappet">API Docs</a> | <a href="#examples">Examples</a></p>
 				<hr>
-				<h2 id="installation-npm-https-www-npmjs-com-package-mappet-">Installation (<a href="https://www.npmjs.com/package/mappet">npm</a>)</h2>
+				<h2 id="installation-npm-">Installation (<a href="https://www.npmjs.com/package/mappet">npm</a>)</h2>
 				<pre><code>npm <span class="hljs-selector-tag">i</span> -S mappet
 </code></pre><h2 id="use-cases">Use cases</h2>
 				<ul>
@@ -84,16 +83,16 @@
 				<h2 id="examples">Examples</h2>
 				<h3 id="basic">Basic</h3>
 				<p>Simple value to value transformation</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema  = [
-  [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
-  [<span class="hljs-string">"cardNumber"</span>, <span class="hljs-string">"card.number"</span>],
-];
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema: = {
+  <span class="hljs-attr">firstName</span>: <span class="hljs-string">"first_name"</span>,
+  <span class="hljs-attr">cardNumber</span>: <span class="hljs-string">"card.number"</span>,
+};
 <span class="hljs-keyword">const</span> mapper = mappet(schema);
 <span class="hljs-keyword">const</span> source = {
-  first_name: <span class="hljs-string">"Michal"</span>,
-  last_name: <span class="hljs-string">"Zalecki"</span>,
-  card: {
-    number: <span class="hljs-string">"5555-5555-5555-4444"</span>,
+  <span class="hljs-attr">first_name</span>: <span class="hljs-string">"Michal"</span>,
+  <span class="hljs-attr">last_name</span>: <span class="hljs-string">"Zalecki"</span>,
+  <span class="hljs-attr">card</span>: {
+    <span class="hljs-attr">number</span>: <span class="hljs-string">"5555-5555-5555-4444"</span>,
   },
 };
 <span class="hljs-keyword">const</span> result = mapper(source);
@@ -105,17 +104,17 @@
 				<h3 id="mapping-values">Mapping values</h3>
 				<p>Third element of schema entry is modifier which allows for mapping values. Modifier accepts current
 				value and entire, original source object.</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> formatDate = (date, source) =&gt; moment(date).format(source.country === <span class="hljs-string">"us"</span> ? <span class="hljs-string">"MM/DD/YY"</span> : <span class="hljs-string">"DD/MM/YY"</span>);
-<span class="hljs-keyword">const</span> upperCase = v =&gt; v.toUpperCase();
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> formatDate = <span class="hljs-function">(<span class="hljs-params">date, source</span>) =&gt;</span> moment(date).format(source.country === <span class="hljs-string">"us"</span> ? <span class="hljs-string">"MM/DD/YY"</span> : <span class="hljs-string">"DD/MM/YY"</span>);
+<span class="hljs-keyword">const</span> upperCase = <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v.toUpperCase();
 
-<span class="hljs-keyword">const</span> schema = [
-  [<span class="hljs-string">"country"</span>, <span class="hljs-string">"country"</span>, upperCase],
-  [<span class="hljs-string">"date"</span>, <span class="hljs-string">"date"</span>, formatDate],
-];
+<span class="hljs-keyword">const</span> schema = {
+  <span class="hljs-attr">country</span>: [<span class="hljs-string">"country"</span>, upperCase],
+  <span class="hljs-attr">date</span>: [<span class="hljs-string">"date"</span>, formatDate],
+};
 <span class="hljs-keyword">const</span> mapper = mappet(schema);
 <span class="hljs-keyword">const</span> source = {
-  country: <span class="hljs-string">"gb"</span>,
-  date: <span class="hljs-string">"2016-07-30"</span>,
+  <span class="hljs-attr">country</span>: <span class="hljs-string">"gb"</span>,
+  <span class="hljs-attr">date</span>: <span class="hljs-string">"2016-07-30"</span>,
 };
 <span class="hljs-keyword">const</span> result = mapper(sourceUS);
 <span class="hljs-comment">// {</span>
@@ -126,48 +125,46 @@
 				<h3 id="filtering-entries">Filtering entries</h3>
 				<p>Fourth element of schema entry is filter which allows for omitting entry based on its value or
 				entire, original source object.</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> skipIfNotAGift = (value, source) =&gt; source.isGift;
-<span class="hljs-keyword">const</span> skipIfGift = (value, source) =&gt; !source.isGift;
-<span class="hljs-keyword">const</span> mapToNull = () =&gt; <span class="hljs-literal">null</span>;
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> skipIfNotAGift = <span class="hljs-function">(<span class="hljs-params">value, source</span>) =&gt;</span> source.isGift;
 
-<span class="hljs-keyword">const</span> schema = [
-  [<span class="hljs-string">"quantity"</span>, <span class="hljs-string">"quantity"</span>],
-  [<span class="hljs-string">"gift.message"</span>, <span class="hljs-string">"giftMessage"</span>, <span class="hljs-literal">undefined</span>, skipIfNotAGift],
-  [<span class="hljs-string">"gift.remind_before_renewing"</span>, <span class="hljs-string">"remindBeforeRenewingGift"</span>, <span class="hljs-literal">undefined</span>, skipIfNotAGift],
-  [<span class="hljs-string">"gift"</span>, <span class="hljs-string">"gift"</span>, mapToNull, skipIfGift],
-];
+<span class="hljs-keyword">const</span> schema = {
+  <span class="hljs-attr">quantity</span>: [<span class="hljs-string">"quantity"</span>],
+  <span class="hljs-attr">gift</span>: {
+    <span class="hljs-attr">message</span>: [<span class="hljs-string">"giftMessage"</span>, <span class="hljs-literal">undefined</span>, skipIfNotAGift],
+    <span class="hljs-attr">remind_before_renewing</span>: [<span class="hljs-string">"remindBeforeRenewingGift"</span>, <span class="hljs-literal">undefined</span>, skipIfNotAGift],
+  },
+};
 <span class="hljs-keyword">const</span> mapper = mappet(schema);
 <span class="hljs-keyword">const</span> source = {
-  quantity: <span class="hljs-number">3</span>,
-  isGift: <span class="hljs-literal">false</span>,
-  giftMessage: <span class="hljs-string">"All best!"</span>,
-  remindBeforeRenewingGift: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">quantity</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">giftMessage</span>: <span class="hljs-string">"All best!"</span>,
+  <span class="hljs-attr">remindBeforeRenewingGift</span>: <span class="hljs-literal">true</span>,
 };
 <span class="hljs-keyword">const</span> result = mapper(sourceNotGift);
 <span class="hljs-comment">// {</span>
 <span class="hljs-comment">//   quantity: 3,</span>
-<span class="hljs-comment">//   gift: null,</span>
 <span class="hljs-comment">// };</span>
 </code></pre>
 				<h3 id="composing-mappers">Composing mappers</h3>
 				<p>Mappers are just clojures. It&#39;s easy to combine them using modifiers.</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> userSchema = [
-  [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
-  [<span class="hljs-string">"lastName"</span>, <span class="hljs-string">"last_name"</span>],
-];
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> userSchema = {
+  <span class="hljs-attr">firstName</span>: <span class="hljs-string">"first_name"</span>,
+  <span class="hljs-attr">lastName</span>: <span class="hljs-string">"last_name"</span>,
+};
 <span class="hljs-keyword">const</span> userMapper = mappet(userSchema);
 
-<span class="hljs-keyword">const</span> usersSchema = [
-  [<span class="hljs-string">"totalCount"</span>, <span class="hljs-string">"total_count"</span>],
-  [<span class="hljs-string">"users"</span>, <span class="hljs-string">"items"</span>, users =&gt; users.map(userMapper)],
-];
+<span class="hljs-keyword">const</span> usersSchema = {
+  <span class="hljs-attr">totalCount</span>: <span class="hljs-string">"total_count"</span>,
+  <span class="hljs-attr">users</span>: [<span class="hljs-string">"items"</span>, users =&gt; users.map(userMapper)],
+};
 <span class="hljs-keyword">const</span> usersMapper = mappet(usersSchema);
 
 <span class="hljs-keyword">const</span> source = {
-  total_count: <span class="hljs-number">5</span>,
-  items: [
-    { first_name: <span class="hljs-string">"Michal"</span>, last_name: <span class="hljs-string">"Zalecki"</span> },
-    { first_name: <span class="hljs-string">"Foo"</span>, last_name: <span class="hljs-string">"Bar"</span> },
+  <span class="hljs-attr">total_count</span>: <span class="hljs-number">5</span>,
+  <span class="hljs-attr">items</span>: [
+    { <span class="hljs-attr">first_name</span>: <span class="hljs-string">"Michal"</span>, <span class="hljs-attr">last_name</span>: <span class="hljs-string">"Zalecki"</span> },
+    { <span class="hljs-attr">first_name</span>: <span class="hljs-string">"Foo"</span>, <span class="hljs-attr">last_name</span>: <span class="hljs-string">"Bar"</span> },
   ],
 };
 <span class="hljs-keyword">const</span> result = usersMapper(source);
@@ -181,32 +178,32 @@
 </code></pre>
 				<h3 id="strict-mode">Strict mode</h3>
 				<p>Mappers in strict mode will throw exception when value is not found on source object.</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema  = [
-  [<span class="hljs-string">"firstName"</span>, <span class="hljs-string">"first_name"</span>],
-  [<span class="hljs-string">"lastName"</span>, <span class="hljs-string">"last_name"</span>],
-];
-<span class="hljs-keyword">const</span> mapper = mappet(schema, { strictMode: <span class="hljs-literal">true</span> });
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema: = {
+  <span class="hljs-attr">firstName</span>: <span class="hljs-string">"first_name"</span>,
+  <span class="hljs-attr">lastName</span>: <span class="hljs-string">"last_name"</span>,
+};
+<span class="hljs-keyword">const</span> mapper = mappet(schema, { <span class="hljs-attr">strictMode</span>: <span class="hljs-literal">true</span> });
 <span class="hljs-keyword">const</span> source = {
-  first_name: <span class="hljs-string">"Michal"</span>,
+  <span class="hljs-attr">first_name</span>: <span class="hljs-string">"Michal"</span>,
 };
 <span class="hljs-keyword">const</span> result = mapper(source);
 <span class="hljs-comment">// Uncaught Mappet: last_name not found</span>
 </code></pre>
 				<p>You can specify mapper name for easier debugging.</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> userMapper = mappet(schema, { strictMode: <span class="hljs-literal">true</span>, name: <span class="hljs-string">"User Mapper"</span> });
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> userMapper = mappet(schema, { <span class="hljs-attr">strictMode</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">"User Mapper"</span> });
 <span class="hljs-keyword">const</span> user = mapper(source);
 <span class="hljs-comment">// Uncaught User Mapper: last_name not found</span>
 </code></pre>
 				<h3 id="greedy-mode">Greedy mode</h3>
 				<p>Mappers in greedy mode will copy all properties from source object.</p>
-				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema = [
-  [<span class="hljs-string">"last_name"</span>, <span class="hljs-string">"last_name"</span>, str =&gt; str.toUpperCase()],
-];
-<span class="hljs-keyword">const</span> mapper = mappet(schema, { greedyMode: <span class="hljs-literal">true</span> });
+				<pre><code class="lang-js"><span class="hljs-keyword">const</span> schema = {
+  <span class="hljs-attr">last_name</span>: [<span class="hljs-string">"last_name"</span>, str =&gt; str.toUpperCase()],
+};
+<span class="hljs-keyword">const</span> mapper = mappet(schema, { <span class="hljs-attr">greedyMode</span>: <span class="hljs-literal">true</span> });
 <span class="hljs-keyword">const</span> source = {
-  first_name: <span class="hljs-string">"Michal"</span>,
-  last_name: <span class="hljs-string">"Zalecki"</span>,
-  email: <span class="hljs-string">"example@michalzalecki.com"</span>,
+  <span class="hljs-attr">first_name</span>: <span class="hljs-string">"Michal"</span>,
+  <span class="hljs-attr">last_name</span>: <span class="hljs-string">"Zalecki"</span>,
+  <span class="hljs-attr">email</span>: <span class="hljs-string">"example@michalzalecki.com"</span>,
 };
 <span class="hljs-keyword">const</span> actual = mapper(source);
 <span class="hljs-comment">// {</span>
@@ -225,10 +222,7 @@
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="modules/_lib_mappet_.html">"lib/mappet"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_test_mappet_test_.html">"test/mappet.test"</a>
+						<a href="modules/_mappet_.html">"mappet"</a>
 					</li>
 				</ul>
 			</nav>
@@ -299,7 +293,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.io" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
