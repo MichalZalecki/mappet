@@ -1,9 +1,9 @@
-import mappet, { Filter, Modifier, Result, Schema, Source } from "./mappet";
-import * as moment from "moment";
+import mappet from "./mappet";
+import moment from "moment";
 
 describe("mappet", () => {
   it("performs simple mapping based on the schema", () => {
-    const schema: Schema = {
+    const schema = {
       firstName: "first_name",
       lastName: "last_name",
       cardNumber: "card.number",
@@ -26,7 +26,7 @@ describe("mappet", () => {
   });
 
   it("not found source elements are undefined", () => {
-    const simpleSchema: Schema = {
+    const simpleSchema = {
       firstName: "first_name",
       lastName: "last_name",
     };
@@ -35,31 +35,49 @@ describe("mappet", () => {
       first_name: "Michal",
     };
     const actual = mapper(source);
-    const expected: {[key: string]: any} = {
+    const expected = {
       firstName: "Michal",
       lastName: undefined,
     };
     expect(actual).toEqual(expected);
   });
 
-  it("throws on not found in strictMode", () => {
-    const schema: Schema = {
+  it("allows for omitting an entry with include", () => {
+    const notNull = v => v === null ? false : true;
+    const schema = {
+      firstName: { path: "first_name", include: notNull },
+      lastName: { path: "last_name", include: notNull },
+    };
+    const mapper = mappet(schema);
+    const source = {
+      first_name: "Michal",
+      last_name: null,
+    };
+    const actual = mapper(source);
+    const expected = {
+      firstName: "Michal",
+    };
+    expect(actual).toEqual(expected);
+  });
+
+  it("throws on not found in strict mode", () => {
+    const schema = {
       firstName: "first_name",
       lastName: "last_name",
     };
-    const mapper = mappet(schema, { strictMode: true });
+    const mapper = mappet(schema, { strict: true });
     const source = {
       first_name: "Michal",
     };
     expect(() => { mapper(source); }).toThrowError("Mappet: last_name not found");
   });
 
-  it("does not throw when entry should be filtered out", () => {
-    const schema: Schema = {
+  it("does not throw when entry should be skipped", () => {
+    const schema = {
       firstName: "first_name",
-      lastName: ["last_name", undefined, () => false],
+      lastName: { path: "last_name", include: () => false },
     };
-    const mapper = mappet(schema, { strictMode: true });
+    const mapper = mappet(schema, { strict: true });
     const source = {
       first_name: "Michal",
     };
@@ -67,11 +85,11 @@ describe("mappet", () => {
   });
 
   it("sets custom mapper name for easier debugging", () => {
-    const schema: Schema = {
+    const schema = {
       firstName: "first_name",
       lastName: "last_name",
     };
-    const myMapper = mappet(schema, { strictMode: true, name: "myMapper" });
+    const myMapper = mappet(schema, { strict: true, name: "myMapper" });
     const source = {
       first_name: "Michal",
     };
@@ -79,19 +97,19 @@ describe("mappet", () => {
   });
 
   it("allows for modifing an entry with modifier", () => {
-    const emptyStringToNull: Modifier = v => v === "" ? null : v;
-    const upperCase: Modifier = v => v.toUpperCase();
-    const schema: Schema = {
-      firstName: ["first_name", upperCase],
-      lastName: ["last_name", emptyStringToNull],
+    const emptyStringToNull = v => v === "" ? null : v;
+    const upperCase = v => v.toUpperCase();
+    const schema = {
+      firstName: { path: "first_name", modifier: upperCase },
+      lastName: { path: "last_name", modifier: emptyStringToNull },
     };
     const mapper = mappet(schema);
-    const source: Source = {
+    const source = {
       first_name: "Michal",
       last_name: "",
     };
     const actual = mapper(source);
-    const expected: Result = {
+    const expected = {
       firstName: "MICHAL",
       lastName: null,
     };
@@ -104,12 +122,12 @@ describe("mappet", () => {
       date: string;
     }
 
-    const formatDate: Modifier = (date: string, source: MySource) =>
+    const formatDate = (date: string, source: MySource) =>
       source.country === "us" ? moment(date).format("MM/DD/YY") : moment(date).format("DD/MM/YY");
 
-    const schema: Schema = {
+    const schema = {
       country: "country",
-      date: ["date", formatDate],
+      date: { path: "date", modifier: formatDate },
     };
 
     const mapper = mappet(schema);
@@ -136,82 +154,16 @@ describe("mappet", () => {
     expect(actualGB).toEqual(expectedGB);
   });
 
-  it("allows for filtering an entry with filter", () => {
-    const skipNull: Filter = v => v === null ? false : true;
-    const schema: Schema  = {
-      firstName: ["first_name", undefined, skipNull],
-      lastName: ["last_name", undefined, skipNull],
-    };
-    const mapper = mappet(schema);
-    const source: Source = {
-      first_name: "Michal",
-      last_name: null,
-    };
-    const actual = mapper(source);
-    const expected: Result = {
-      firstName: "Michal",
-    };
-    expect(actual).toEqual(expected);
-  });
-
-  it("allows for filtering depending on source", () => {
-    interface MySource {
-      quantity: number;
-      isGift: boolean;
-      gift: { message: string, remind_before_renewing: boolean };
-    }
-
-    const skipIfNotAGift: Filter = (value: any, source: MySource) => source.isGift;
-
-    const schema: Schema = {
-      quantity: ["quantity"],
-      gift: {
-        message: ["giftMessage", undefined, skipIfNotAGift],
-        remind_before_renewing: ["remindBeforeRenewingGift", undefined, skipIfNotAGift],
-      },
-    };
-
-    const mapper = mappet(schema);
-
-    const sourceNotGift: Source = {
-      quantity: 3,
-      isGift: false,
-      giftMessage: "All best!",
-      remindBeforeRenewingGift: true,
-    };
-    const actualNotGift = mapper(sourceNotGift);
-    const expectedNotGift: Result = {
-      quantity: 3,
-    };
-    expect(actualNotGift).toEqual(expectedNotGift);
-
-    const sourceGift: Source = {
-      quantity: 3,
-      isGift: true,
-      giftMessage: "All best!",
-      remindBeforeRenewingGift: true,
-    };
-    const actualGift = mapper(sourceGift);
-    const expectedGift: Result = {
-      quantity: 3,
-      gift: {
-        message: "All best!",
-        remind_before_renewing: true,
-      },
-    };
-    expect(actualGift).toEqual(expectedGift);
-  });
-
   it("allows for composing mappers", () => {
-    const userSchema: Schema = {
+    const userSchema = {
       firstName: "first_name",
       lastName: "last_name",
     };
     const userMapper = mappet(userSchema);
 
-    const usersSchema: Schema = {
+    const usersSchema = {
       totalCount: "total_count",
-      users: ["items", users => users.map(userMapper)],
+      users: { path: "items", modifier: users => users.map(userMapper) },
     };
     const usersMapper = mappet(usersSchema);
 
@@ -234,10 +186,10 @@ describe("mappet", () => {
   });
 
   it("copy all existing properties in greedy mode", () => {
-    const schema: Schema = {
-      last_name: ["last_name", (str: string) => str.toUpperCase()],
+    const schema = {
+      last_name: { path: "last_name", modifier: (str: string) => str.toUpperCase() },
     };
-    const mapper = mappet(schema, { greedyMode: true });
+    const mapper = mappet(schema, { greedy: true });
 
     const source = {
       first_name: "Michal",

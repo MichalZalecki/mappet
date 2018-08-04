@@ -1,6 +1,6 @@
 {
   "name": "mappet",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Lightweight, composable mappers for object transformations",
   "main": "./lib/mappet.js",
   "typings": "./lib/mappet.d.ts",
@@ -10,7 +10,8 @@
     "test": "jest",
     "doc": "typedoc --out doc src/lib/mappet.ts",
     "clean": "rm -rf doc lib test",
-    "lint": "tslint src/lib/* src/test/*"
+    "lint": "tslint src/lib/* src/test/*",
+    "prepublishOnly": "npm test && npm run lint && npm run build"
   },
   "jest": {
     "testEnvironment": "node",
