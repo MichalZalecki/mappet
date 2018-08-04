@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 4.0.0
+
+* Change schema entry to object instead of using tuples
+* Drop nested schema support for better type inference in TypeScript; compose mappers instead
+* Move to Jest for unit tests
+
 ## 3.0.0
 
 * Change schema so its shape reflects its output
