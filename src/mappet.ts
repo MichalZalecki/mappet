@@ -1,30 +1,22 @@
 import get = require("lodash/get");
 
 type Source = {
-  [key: string]: any
-}
+  [key: string]: any,
+};
 
 type Result<T> = {
   [K in keyof T]: any
-}
+};
 
 type Path = string;
-type Modifier = (value: any, source: any) => any
-type Include = (value: any, source: any) => boolean
+type Modifier = (value: any, source: any) => any;
+type Include = (value: any, source: any) => boolean;
 
 export type SchemaEntry = Path | { path: Path, modifier?: Modifier, include?: Include };
 
 type Schema = {
-  [key: string]: SchemaEntry
-}
-
-function identity<T>(val: T) {
-  return val;
-}
-
-function always(val: any) {
-  return true;
-}
+  [key: string]: SchemaEntry,
+};
 
 interface MappetOptions {
   /**
@@ -55,6 +47,14 @@ interface MappetOptions {
    * ~~~
    */
   name?: string;
+}
+
+function identity<T>(val: T) {
+  return val;
+}
+
+function always(val: any) {
+  return true;
 }
 
 /**
