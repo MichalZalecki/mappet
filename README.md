@@ -29,7 +29,7 @@ npm i -S mappet
 Simple value to value transformation
 
 ```js
-const schema: = {
+const schema = {
   firstName: "first_name",
   cardNumber: "card.number",
 };
@@ -77,12 +77,12 @@ const result = mapper(sourceUS);
 Using `include` you can control which values should be keept and what dropped.
 
 ```js
-const isNotGit = (value, source) => !source.isGift;
+const isNotGift = (value, source) => !source.isGift;
 
 const schema = {
   quantity: ["quantity"],
-  message: { path: "giftMessage", include: isNotGit },
-  remind_before_renewing: { path: "remindBeforeRenewingGift", include: isNotGit },
+  message: { path: "giftMessage", include: isNotGift },
+  remind_before_renewing: { path: "remindBeforeRenewingGift", include: isNotGift },
 };
 const mapper = mappet(schema);
 const source = {
@@ -164,7 +164,7 @@ Mappers in greedy mode will copy all properties from source object.
 const schema = {
   last_name: ["last_name", str => str.toUpperCase()],
 };
-const mapper = mappet(schema, { greedyMode: true });
+const mapper = mappet(schema, { greedy: true });
 const source = {
   first_name: "Michal",
   last_name: "Zalecki",
@@ -178,4 +178,4 @@ const actual = mapper(source);
 // }
 ```
 
-See [tests](src/test/mappet.test.ts) for more examples.
+See [tests](src/mappet.spec.ts) for more examples.
