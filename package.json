@@ -1,6 +1,6 @@
 {
   "name": "mappet",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Lightweight, composable mappers for object transformations",
   "main": "./lib/mappet.js",
   "typings": "./lib/mappet.d.ts",
@@ -39,20 +39,20 @@
   },
   "homepage": "https://github.com/MichalZalecki/mappet#readme",
   "devDependencies": {
-    "@types/jest": "^23.3.1",
-    "@types/lodash": "^4.14.116",
-    "jest": "^23.4.2",
-    "moment": "^2.22.2",
-    "ts-jest": "^23.1.2",
-    "tslint": "^5.11.0",
-    "typedoc": "^0.11.1",
-    "typescript": "^3.0.1"
+    "@types/jest": "^24.0.11",
+    "@types/lodash": "^4.14.123",
+    "jest": "^24.0.11",
+    "moment": "^2.24.0",
+    "ts-jest": "^24.0.0",
+    "tslint": "^5.14.0",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.3.3333"
   },
   "files": [
     "lib"
   ],
   "dependencies": {
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.11"
   },
   "keywords": [
     "normalization",

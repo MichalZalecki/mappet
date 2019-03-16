@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 4.1.0
+
+* Update dependencies
+* A few minor fixes for strict TypeScript checks in unit tests
+
 ## 4.0.0
 
 * Change schema entry to object instead of using tuples

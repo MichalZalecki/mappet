@@ -99,7 +99,7 @@ const result = mapper(sourceNotGift);
 
 ### Composing mappers
 
-Mappers are just clojures. It's easy to combine them using modifiers.
+Mappers are just closures. It's easy to combine them using modifiers.
 
 ```js
 const userSchema = {

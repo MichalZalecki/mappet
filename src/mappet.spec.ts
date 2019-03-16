@@ -43,7 +43,7 @@ describe("mappet", () => {
   });
 
   it("allows for omitting an entry with include", () => {
-    const notNull = (v) => v === null ? false : true;
+    const notNull = (v: any) => v === null ? false : true;
     const schema = {
       firstName: { path: "first_name", include: notNull },
       lastName: { path: "last_name", include: notNull },
@@ -97,8 +97,8 @@ describe("mappet", () => {
   });
 
   it("allows for modifing an entry with modifier", () => {
-    const emptyStringToNull = (v) => v === "" ? null : v;
-    const upperCase = (v) => v.toUpperCase();
+    const emptyStringToNull = (v: string) => v === "" ? null : v;
+    const upperCase = (v: string) => v.toUpperCase();
     const schema = {
       firstName: { path: "first_name", modifier: upperCase },
       lastName: { path: "last_name", modifier: emptyStringToNull },
@@ -161,9 +161,14 @@ describe("mappet", () => {
     };
     const userMapper = mappet(userSchema);
 
+    interface User {
+      firstName: string;
+      lastName: string;
+    }
+
     const usersSchema = {
       totalCount: "total_count",
-      users: { path: "items", modifier: (users) => users.map(userMapper) },
+      users: { path: "items", modifier: (users: User[]) => users.map(userMapper) },
     };
     const usersMapper = mappet(usersSchema);
 
