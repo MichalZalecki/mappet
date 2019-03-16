@@ -53,7 +53,7 @@ function identity<T>(val: T) {
   return val;
 }
 
-function always(val: any) {
+function always(_val: any) {
   return true;
 }
 
