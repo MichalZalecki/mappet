@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 4.2.0
+
+* Improve typings for greedy mode. ([#11](https://github.com/MichalZalecki/mappet/pull/11), thanks to [rkrupinski](https://github.com/rkrupinski))
+* Update dependencies
+
 ## 4.1.0
 
 * Update dependencies
