@@ -64,9 +64,12 @@ function always(_val: any) {
  * @param options - Mapper configuration
  * @returns Mapper function
  */
-export default function mappet<S extends Schema>(schema: S, options: MappetOptions = {}) {
+export default function mappet<
+  S extends Schema,
+  O extends MappetOptions,
+>(schema: S, options: Partial<O> = {}) {
   const { strict, name = "Mappet", greedy } = options;
-  return (source: Source): Result<S> =>
+  return <T extends Source>(source: T) =>
     Object.keys(schema)
       .reduce((result, key) => {
         const schemaEntry = schema[key];
@@ -85,5 +88,5 @@ export default function mappet<S extends Schema>(schema: S, options: MappetOptio
         }
 
         return ({ ...result, [key]: modifier(value, source) });
-      }, greedy ? { ...source } : {}) as Result<S>;
+      }, greedy ? { ...source } : {}) as Result<O extends { greedy: true } ? T & S : S>
 }
