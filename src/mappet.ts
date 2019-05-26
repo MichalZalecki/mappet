@@ -88,5 +88,5 @@ export default function mappet<
         }
 
         return ({ ...result, [key]: modifier(value, source) });
-      }, greedy ? { ...source } : {}) as Result<O extends { greedy: true } ? T & S : S>
+      }, greedy ? source : {}) as Result<O extends { greedy: true } ? T & S : S>;
 }

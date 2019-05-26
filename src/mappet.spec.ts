@@ -202,11 +202,8 @@ describe("mappet", () => {
       email: "example@michalzalecki.com",
     };
     const actual = mapper(source);
-    const expected = {
-      first_name: "Michal",
-      last_name: "ZALECKI",
-      email: "example@michalzalecki.com",
-    };
-    expect(actual).toEqual(expected);
+    expect(actual.first_name).toEqual("Michal");
+    expect(actual.last_name).toEqual("ZALECKI");
+    expect(actual.email).toEqual("example@michalzalecki.com");
   });
 });
