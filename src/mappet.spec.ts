@@ -206,4 +206,37 @@ describe("mappet", () => {
     expect(actual.last_name).toEqual("ZALECKI");
     expect(actual.email).toEqual("example@michalzalecki.com");
   });
+
+  it("behaves like lodash's get in regard to dots in property names", () => {
+    const schema = {
+      ab: "a.b",
+      cde: "c.d.e",
+      cxz: "c.y.z",
+    };
+    const mapper = mappet(schema);
+
+    const source = {
+      "a.b": 1,
+      "a": {
+        b: 2,
+      },
+      "c": {
+        "d": {
+          e: 3,
+        },
+        /**
+         * https://github.com/lodash/lodash/issues/1637#issuecomment-156258271
+         *
+         * To support this case it will be required to change and support `type Path = string | string[]`
+         * Example `cxz: { path: ["c", "y.z"], modifier: (f:any) => f },` and/or make `modifier` optional.
+         */
+        "d.e": 4,
+        "y.z": "You cannot get this and 'd.e'",
+      },
+    };
+    const actual = mapper(source);
+    expect(actual.ab).toEqual(1);
+    expect(actual.cde).toEqual(3);
+    expect(actual.cxz).toBeUndefined();
+  });
 });
