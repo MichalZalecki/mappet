@@ -43,7 +43,7 @@ describe("mappet", () => {
   });
 
   it("allows for omitting an entry with include", () => {
-    const notNull = (v: any) => v === null ? false : true;
+    const notNull = (v: any) => v !== null;
     const schema = {
       firstName: { path: "first_name", include: notNull },
       lastName: { path: "last_name", include: notNull },
