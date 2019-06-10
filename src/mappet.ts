@@ -58,7 +58,7 @@ function always(_val: any) {
   return true;
 }
 
-function hasPathOnly(schemaEntry: SchemaEntry) {
+function hasPathOnly(schemaEntry: SchemaEntry): schemaEntry is Path {
   return typeof schemaEntry === "string" || Array.isArray(schemaEntry);
 }
 
@@ -78,15 +78,15 @@ export default function mappet<
     Object.keys(schema)
       .reduce((result, key) => {
         const schemaEntry = schema[key];
-        const include = hasPathOnly(schemaEntry) ? always : (schemaEntry as ComplexSchemaEntry).include || always;
-        const path = hasPathOnly(schemaEntry) ? (schemaEntry as Path) : (schemaEntry as ComplexSchemaEntry).path;
+        const include = hasPathOnly(schemaEntry) ? always : schemaEntry.include || always;
+        const path = hasPathOnly(schemaEntry) ? schemaEntry : schemaEntry.path;
         const value = get(source, path);
 
         if (!include(value, source)) {
           return result;
         }
 
-        const modifier = hasPathOnly(schemaEntry) ? identity : (schemaEntry as ComplexSchemaEntry).modifier || identity;
+        const modifier = hasPathOnly(schemaEntry) ? identity : schemaEntry.modifier || identity;
 
         if (strict && value === undefined) {
           throw new Error(`${name}: ${path} not found`);
