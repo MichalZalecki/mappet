@@ -1,23 +1,28 @@
 import get = require("lodash/get");
 
-type Source = {
-  [key: string]: any,
-};
+interface Source {
+  [key: string]: any;
+}
 
 type Result<T> = {
-  [K in keyof T]: any
+  [K in keyof T]: any;
 };
 
-type Path = string | string[];
 type Modifier = (value: any, source: any) => any;
 type Include = (value: any, source: any) => boolean;
-type ComplexSchemaEntry = { path: Path, modifier?: Modifier, include?: Include };
 
-export type SchemaEntry = Path | ComplexSchemaEntry;
+type Path = string | string[];
+interface PathConfig {
+  path: Path;
+  modifier?: Modifier;
+  include?: Include;
+}
 
-type Schema = {
-  [key: string]: SchemaEntry,
-};
+export type SchemaEntry = Path | PathConfig;
+
+interface Schema {
+  [key: string]: SchemaEntry;
+}
 
 interface MappetOptions {
   /**
@@ -58,7 +63,7 @@ function always(_val: any) {
   return true;
 }
 
-function hasPathOnly(schemaEntry: SchemaEntry): schemaEntry is Path {
+function isPath(schemaEntry: SchemaEntry): schemaEntry is Path {
   return typeof schemaEntry === "string" || Array.isArray(schemaEntry);
 }
 
@@ -69,29 +74,31 @@ function hasPathOnly(schemaEntry: SchemaEntry): schemaEntry is Path {
  * @param options - Mapper configuration
  * @returns Mapper function
  */
-export default function mappet<
-  S extends Schema,
-  O extends MappetOptions,
-  >(schema: S, options: Partial<O> = {}) {
+export default function mappet<S extends Schema, O extends MappetOptions>(
+  schema: S,
+  options: Partial<O> = {},
+) {
   const { strict, name = "Mappet", greedy } = options;
   return <T extends Source>(source: T) =>
-    Object.keys(schema)
-      .reduce((result, key) => {
+    Object.keys(schema).reduce(
+      (result, key) => {
         const schemaEntry = schema[key];
-        const include = hasPathOnly(schemaEntry) ? always : schemaEntry.include || always;
-        const path = hasPathOnly(schemaEntry) ? schemaEntry : schemaEntry.path;
+        const include = isPath(schemaEntry) ? always : schemaEntry.include || always;
+        const path = isPath(schemaEntry) ? schemaEntry : schemaEntry.path;
         const value = get(source, path);
 
         if (!include(value, source)) {
           return result;
         }
 
-        const modifier = hasPathOnly(schemaEntry) ? identity : schemaEntry.modifier || identity;
+        const modifier = isPath(schemaEntry) ? identity : schemaEntry.modifier || identity;
 
         if (strict && value === undefined) {
           throw new Error(`${name}: ${path} not found`);
         }
 
-        return ({ ...result, [key]: modifier(value, source) });
-      }, greedy ? source : {}) as Result<O extends { greedy: true } ? T & S : S>;
+        return { ...result, [key]: modifier(value, source) };
+      },
+      greedy ? source : {},
+    ) as Result<O extends { greedy: true } ? T & S : S>;
 }

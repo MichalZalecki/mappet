@@ -10,7 +10,8 @@
     "test": "jest",
     "doc": "typedoc --out doc src/mappet.ts",
     "clean": "rm -rf doc lib test",
-    "lint": "tslint src/*",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --write src/*.ts",
     "prepublishOnly": "npm test && npm run lint && npm run build"
   },
   "jest": {
@@ -41,10 +42,16 @@
   "devDependencies": {
     "@types/jest": "^24.0.13",
     "@types/lodash": "^4.14.132",
+    "@typescript-eslint/eslint-plugin": "^1.10.2",
+    "@typescript-eslint/parser": "^1.10.2",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^5.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.13.0",
     "jest": "^24.8.0",
     "moment": "^2.24.0",
+    "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
-    "tslint": "^5.16.0",
     "typedoc": "^0.14.2",
     "typescript": "^3.4.5"
   },

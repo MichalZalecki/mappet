@@ -69,7 +69,9 @@ describe("mappet", () => {
     const source = {
       first_name: "Michal",
     };
-    expect(() => { mapper(source); }).toThrowError("Mappet: last_name not found");
+    expect(() => {
+      mapper(source);
+    }).toThrowError("Mappet: last_name not found");
   });
 
   it("does not throw when entry should be skipped", () => {
@@ -81,7 +83,9 @@ describe("mappet", () => {
     const source = {
       first_name: "Michal",
     };
-    expect(() => { mapper(source); }).not.toThrow();
+    expect(() => {
+      mapper(source);
+    }).not.toThrow();
   });
 
   it("sets custom mapper name for easier debugging", () => {
@@ -93,11 +97,13 @@ describe("mappet", () => {
     const source = {
       first_name: "Michal",
     };
-    expect(() => { myMapper(source); }).toThrowError("myMapper: last_name not found");
+    expect(() => {
+      myMapper(source);
+    }).toThrowError("myMapper: last_name not found");
   });
 
   it("allows for modifing an entry with modifier", () => {
-    const emptyStringToNull = (v: string) => v === "" ? null : v;
+    const emptyStringToNull = (v: string) => (v === "" ? null : v);
     const upperCase = (v: string) => v.toUpperCase();
     const schema = {
       firstName: { path: "first_name", modifier: upperCase },
@@ -182,10 +188,7 @@ describe("mappet", () => {
     const actual = usersMapper(source);
     const expected = {
       totalCount: 5,
-      users: [
-        { firstName: "Michal", lastName: "Zalecki" },
-        { firstName: "Foo", lastName: "Bar" },
-      ],
+      users: [{ firstName: "Michal", lastName: "Zalecki" }, { firstName: "Foo", lastName: "Bar" }],
     };
     expect(actual).toEqual(expected);
   });
@@ -221,21 +224,18 @@ describe("mappet", () => {
 
     const source = {
       "a.b": 1,
-      "a": {
+      a: {
         b: 2,
       },
-      "c": {
-        "d": {
+      c: {
+        d: {
           e: 5,
         },
         "d.e": 4,
       },
       "c.d.e": 3,
-      "f": {
-        g: [
-          99,
-          7,
-        ],
+      f: {
+        g: [99, 7],
       },
       "f.g[1]": 6,
     };
@@ -267,7 +267,7 @@ describe("mappet", () => {
     const source = [
       {
         a: {
-          "b": {
+          b: {
             c: "value",
           },
           "b.c": "_",
@@ -276,10 +276,7 @@ describe("mappet", () => {
       {
         firstNames: ["John", "Fitzgerald"],
       },
-      [
-        "Skłodowska",
-        "Curie",
-      ],
+      ["Skłodowska", "Curie"],
     ];
     const actual = mapper(source);
     expect(actual._a_b_c).toEqual("value");
