@@ -1,8 +1,14 @@
 # CHANGELOG
 
+## 4.3.0
+
+* Support path array ([#17](https://github.com/MichalZalecki/mappet/pull/17), thanks to [KrzysztofKarol](https://github.com/KrzysztofKarol))
+* Replace TSLint with ESLint
+* Update dev dependencies
+
 ## 4.2.0
 
-* Improve typings for greedy mode. ([#11](https://github.com/MichalZalecki/mappet/pull/11), thanks to [rkrupinski](https://github.com/rkrupinski))
+* Improve typings for greedy mode ([#11](https://github.com/MichalZalecki/mappet/pull/11), thanks to [rkrupinski](https://github.com/rkrupinski))
 * Update dependencies
 
 ## 4.1.0
