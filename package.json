@@ -10,7 +10,8 @@
     "test": "jest",
     "doc": "typedoc --out doc src/mappet.ts",
     "clean": "rm -rf doc lib test",
-    "lint": "eslint . --ext ts --ignore-pattern \"lib/\"",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --write src/*.ts",
     "prepublishOnly": "npm test && npm run lint && npm run build"
   },
   "jest": {
