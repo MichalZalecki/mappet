@@ -65,7 +65,7 @@ const source = {
   country: "gb",
   date: "2016-07-30",
 };
-const result = mapper(sourceUS);
+const result = mapper(source);
 // {
 //   country: "GB",
 //   date: "30/07/16",
@@ -77,12 +77,12 @@ const result = mapper(sourceUS);
 Using `include` you can control which values should be keept and what dropped.
 
 ```js
-const isNotGift = (value, source) => !source.isGift;
+const isGift = (value, source) => source.isGift;
 
 const schema = {
   quantity: ["quantity"],
-  message: { path: "giftMessage", include: isNotGift },
-  remind_before_renewing: { path: "remindBeforeRenewingGift", include: isNotGift },
+  message: { path: "giftMessage", include: isGift },
+  remind_before_renewing: { path: "remindBeforeRenewingGift", include: isGift },
 };
 const mapper = mappet(schema);
 const source = {
@@ -91,7 +91,7 @@ const source = {
   giftMessage: "All best!",
   remindBeforeRenewingGift: true,
 };
-const result = mapper(sourceNotGift);
+const result = mapper(source);
 // {
 //   quantity: 3,
 // };
@@ -118,7 +118,7 @@ const source = {
   total_count: 5,
   items: [
     { first_name: "Michal", last_name: "Zalecki" },
-    { first_name: "Foo", last_name: "Bar" },
+    { first_name: "John", last_name: "Doe" },
   ],
 };
 const result = usersMapper(source);
@@ -126,7 +126,7 @@ const result = usersMapper(source);
 //   totalCount: 5,
 //   users: [
 //     { firstName: "Michal", lastName: "Zalecki" },
-//     { firstName: "Foo", lastName: "Bar" },
+//     { firstName: "John", lastName: "Doe" },
 //   ],
 // }
 ```
@@ -136,11 +136,11 @@ const result = usersMapper(source);
 Mappers in strict mode will throw exception when value is not found on source object.
 
 ```js
-const schema: = {
+const schema = {
   firstName: "first_name",
   lastName: "last_name",
 };
-const mapper = mappet(schema, { strictMode: true });
+const mapper = mappet(schema, { strict: true });
 const source = {
   first_name: "Michal",
 };
@@ -162,7 +162,7 @@ Mappers in greedy mode will copy all properties from source object.
 
 ```js
 const schema = {
-  last_name: ["last_name", str => str.toUpperCase()],
+  last_name: { path: "last_name", modifier: str => str.toUpperCase() },
 };
 const mapper = mappet(schema, { greedy: true });
 const source = {

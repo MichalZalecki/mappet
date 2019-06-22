@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.3.1
+
+* Fix examples in README.md
+
 ## 4.3.0
 
 * Support path array ([#17](https://github.com/MichalZalecki/mappet/pull/17), thanks to [KrzysztofKarol](https://github.com/KrzysztofKarol))
