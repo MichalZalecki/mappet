@@ -8,11 +8,12 @@ type Result<T> = {
   [K in keyof T]: any
 };
 
-type Path = string;
+type Path = string | string[];
 type Modifier = (value: any, source: any) => any;
 type Include = (value: any, source: any) => boolean;
+type ComplexSchemaEntry = { path: Path, modifier?: Modifier, include?: Include };
 
-export type SchemaEntry = Path | { path: Path, modifier?: Modifier, include?: Include };
+export type SchemaEntry = Path | ComplexSchemaEntry;
 
 type Schema = {
   [key: string]: SchemaEntry,
@@ -57,6 +58,10 @@ function always(_val: any) {
   return true;
 }
 
+function hasPathOnly(schemaEntry: SchemaEntry): schemaEntry is Path {
+  return typeof schemaEntry === "string" || Array.isArray(schemaEntry);
+}
+
 /**
  * Factory for creating mappers
  *
@@ -67,21 +72,21 @@ function always(_val: any) {
 export default function mappet<
   S extends Schema,
   O extends MappetOptions,
->(schema: S, options: Partial<O> = {}) {
+  >(schema: S, options: Partial<O> = {}) {
   const { strict, name = "Mappet", greedy } = options;
   return <T extends Source>(source: T) =>
     Object.keys(schema)
       .reduce((result, key) => {
         const schemaEntry = schema[key];
-        const include = typeof schemaEntry === "string" ? always : schemaEntry.include || always;
-        const path = typeof schemaEntry === "string" ? schemaEntry : schemaEntry.path;
+        const include = hasPathOnly(schemaEntry) ? always : schemaEntry.include || always;
+        const path = hasPathOnly(schemaEntry) ? schemaEntry : schemaEntry.path;
         const value = get(source, path);
 
         if (!include(value, source)) {
           return result;
         }
 
-        const modifier = typeof schemaEntry === "string" ? identity : schemaEntry.modifier || identity;
+        const modifier = hasPathOnly(schemaEntry) ? identity : schemaEntry.modifier || identity;
 
         if (strict && value === undefined) {
           throw new Error(`${name}: ${path} not found`);

@@ -43,7 +43,7 @@ describe("mappet", () => {
   });
 
   it("allows for omitting an entry with include", () => {
-    const notNull = (v: any) => v === null ? false : true;
+    const notNull = (v: any) => v !== null;
     const schema = {
       firstName: { path: "first_name", include: notNull },
       lastName: { path: "last_name", include: notNull },
@@ -205,5 +205,85 @@ describe("mappet", () => {
     expect(actual.first_name).toEqual("Michal");
     expect(actual.last_name).toEqual("ZALECKI");
     expect(actual.email).toEqual("example@michalzalecki.com");
+  });
+
+  it("behaves like lodash's get in regard to dots in property names", () => {
+    const schema = {
+      ab: "a.b",
+      a_b: ["a", "b"],
+      cde: "c.d.e",
+      c_de: ["c", "d.e"],
+      c_d_e: ["c", "d", "e"],
+      fg1: "f.g[1]",
+      f_g_1: ["f", "g", "1"],
+    };
+    const mapper = mappet(schema);
+
+    const source = {
+      "a.b": 1,
+      "a": {
+        b: 2,
+      },
+      "c": {
+        "d": {
+          e: 5,
+        },
+        "d.e": 4,
+      },
+      "c.d.e": 3,
+      "f": {
+        g: [
+          99,
+          7,
+        ],
+      },
+      "f.g[1]": 6,
+    };
+    const actual = mapper(source);
+    expect(actual.ab).toEqual(1);
+    expect(actual.a_b).toEqual(2);
+    expect(actual.cde).toEqual(3);
+    expect(actual.c_de).toEqual(4);
+    expect(actual.c_d_e).toEqual(5);
+    expect(actual.fg1).toEqual(6);
+    expect(actual.f_g_1).toEqual(7);
+  });
+
+  it("supports path array along with 'modifier' and 'include'", () => {
+    const schema = {
+      _a_b_c: { path: ["0", "a", "b", "c"] },
+      firstName: {
+        path: "1.firstNames.0",
+        modifier: (firstName: string) => firstName.toUpperCase(),
+      },
+      lastName: {
+        path: "2",
+        modifier: (arr: any[]) => arr.join("-"),
+        include: (v: any) => Array.isArray(v),
+      },
+    };
+    const mapper = mappet(schema);
+
+    const source = [
+      {
+        a: {
+          "b": {
+            c: "value",
+          },
+          "b.c": "_",
+        },
+      },
+      {
+        firstNames: ["John", "Fitzgerald"],
+      },
+      [
+        "Skłodowska",
+        "Curie",
+      ],
+    ];
+    const actual = mapper(source);
+    expect(actual._a_b_c).toEqual("value");
+    expect(actual.firstName).toEqual("JOHN");
+    expect(actual.lastName).toEqual("Skłodowska-Curie");
   });
 });
